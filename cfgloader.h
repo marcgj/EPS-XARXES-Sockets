@@ -13,14 +13,16 @@ typedef struct{
 
 typedef struct{
     char id[10];
+
     Element elements[5];
     int elemc;
+
     int tcpPort;
-    char address[50];
+    char address[64];
     int udpPort;
 } ClientCfg;
 
-int load_config(char *filename, ClientCfg *clientConfig);
+void load_config(char *filename, ClientCfg *clientConfig);
 void print_config(ClientCfg *clientCfg);
 
 #endif //SO_PRACTICA1_CFGLOADER_H

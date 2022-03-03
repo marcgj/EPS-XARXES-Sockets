@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int load_config(char *filename, ClientCfg *clientConfig) {
+void load_config(char *filename, ClientCfg *clientConfig) {
     system("pwd");
 
     FILE *f = fopen(filename, "r");
@@ -43,15 +43,18 @@ int load_config(char *filename, ClientCfg *clientConfig) {
 }
 
 void print_config(ClientCfg *cfg) {
+    printf("---------- Client Config ----------\n");
     printf("Id: %s \n", cfg->id);
     printf("Address: %s \n", cfg->address);
-    printf("TCP: %i ", cfg->tcpPort);
-    printf("UDP: %d \n", cfg->udpPort);
+    printf("TCP: %i\n", cfg->tcpPort);
+    printf("UDP: %d \n\n", cfg->udpPort);
     for (int i = 0; i < cfg->elemc; ++i) {
         printf("Mag: %s ", cfg->elements[i].magnitude);
         printf("Ord: %i ", cfg->elements[i].ordinal);
         printf("Type: %c \n", cfg->elements[i].type);
     }
+    printf("-----------------------------------");
+
 }
 
 
