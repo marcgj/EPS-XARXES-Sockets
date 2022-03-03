@@ -10,3 +10,16 @@
 #include <time.h>
 #include <string.h>
 
+#include "cfgloader.h"
+
+#define DEFAULT_CFG "../client.cfg"
+
+
+
+int main(int argc, char *argv[]){
+    ClientCfg cfg;
+    load_config(DEFAULT_CFG, &cfg);
+    print_config(&cfg);
+
+}
+
