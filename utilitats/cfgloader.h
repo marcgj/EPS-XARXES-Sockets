@@ -17,9 +17,9 @@ typedef struct{
     Element elements[5];
     int elemc;
 
-    int tcpPort;
+    int local_TCP;
     char address[64];
-    int udpPort;
+    int server_UDP;
 } ClientCfg;
 
 void load_config(char *filename, ClientCfg *clientConfig);

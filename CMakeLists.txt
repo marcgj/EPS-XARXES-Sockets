@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.21)
-project(SO_Practica1 C)
+project(Xarxes_Practica1 C)
 
 set(CMAKE_C_STANDARD 17)
 
-add_executable(Client client.c cfgloader.c cfgloader.h)
+add_executable(Client client.c utilitats/cfgloader.c utilitats/cfgloader.h utilitats/conexions.c utilitats/conexions.h)
 
 cmake_minimum_required(VERSION 3.21)
 

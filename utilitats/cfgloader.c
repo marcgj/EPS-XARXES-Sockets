@@ -34,9 +34,9 @@ void load_config(char *filename, ClientCfg *clientConfig) {
         }
     }
 
-    fscanf(f, "Local-TCP = %i\n", &clientConfig->tcpPort);
+    fscanf(f, "Local-TCP = %i\n", &clientConfig->local_TCP);
     fscanf(f, "Server = %s\n", clientConfig->address);
-    fscanf(f, "Server-UDP = %i\n", &clientConfig->udpPort);
+    fscanf(f, "Server-UDP = %i\n", &clientConfig->server_UDP);
 
     printf("Conf Loaded\n");
     fclose(f);
@@ -46,8 +46,8 @@ void print_config(ClientCfg *cfg) {
     printf("---------- Client Config ----------\n");
     printf("Id: %s \n", cfg->id);
     printf("Address: %s \n", cfg->address);
-    printf("TCP: %i\n", cfg->tcpPort);
-    printf("UDP: %d \n\n", cfg->udpPort);
+    printf("TCP: %i\n", cfg->local_TCP);
+    printf("UDP: %d \n\n", cfg->server_UDP);
     for (int i = 0; i < cfg->elemc; ++i) {
         printf("Mag: %s ", cfg->elements[i].magnitude);
         printf("Ord: %i ", cfg->elements[i].ordinal);
