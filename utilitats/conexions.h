@@ -31,12 +31,15 @@ int configure_udp(int port);
 struct sockaddr_in sockaddr_in_generator(char * address, int port);
 int reg_procedure(int sock, struct sockaddr_in addr_server, ClientCfg *cfg);
 
+
 typedef struct{
     unsigned char type;
     char tx_id[11];
     char comm_id[11];
     char data[61];
 }PDU;
+
+void print_PDU(PDU pdu, char * pretext);
 
 typedef struct {
     char comm_id[11];
