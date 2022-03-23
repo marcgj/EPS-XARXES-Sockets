@@ -59,7 +59,7 @@ void process_args(int argc, char **argv, char * cfgFileName) {
                     break;
 
                 default:
-                    perror("Parametre no reconegut\n");
+                    printf("Parametre no reconegut");
                     exit(1);
                     break;
             }
@@ -90,7 +90,7 @@ int configure_udp(char * address, int port, struct sockaddr_in *addr_server) {
     addr_server->sin_port = htons(port);
     addr_server->sin_addr.s_addr = (((struct in_addr *) ent -> h_addr) -> s_addr);
 
-    if(bind(sock,(struct sockaddr*) &addr_server, sizeof(*addr_server)) < 0){
+    if(bind(sock,(struct sockaddr*) addr_server, sizeof(*addr_server)) < 0){
         perror("Error bind");
         exit(-1);
     }
@@ -99,7 +99,6 @@ int configure_udp(char * address, int port, struct sockaddr_in *addr_server) {
 }
 
 int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg) {
-    if (debug) printf("Inici proces de registre\n");
 
     int const t = 1, u = 2, n = 8, o = 3, p = 2, q = 4;
     int packets = 1, procedures = 0;
@@ -117,11 +116,15 @@ int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg) {
     tv.tv_sec = t;
     tv.tv_usec = 0;
 
+    if (debug) printf("Inici proces de registre\n");
+    status = NOT_REGISTERED;
     while (status != REGISTERED){
+        if (debug) printf("\nPackets enviats = %i, Procesos de registre = %i | Temps entre paquets = %i\n", packets, procedures, (int) tv.tv_sec);
+
         FD_ZERO(&fileDesctiptors);
 
         if(procedures > o){
-            perror("No s'ha pogut conectar amb el servidor");
+            printf("No s'ha pogut conectar amb el servidor\n");
             exit(1);
         }
 
@@ -131,17 +134,27 @@ int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg) {
             packets = 1;
             tv.tv_sec = t;
             procedures++;
+
+            if (debug) printf("Començant nou proces de registre (%i), i esperant %is\n", procedures, u);
+
             sleep(u);
         }
 
         switch (status) {
             case NOT_REGISTERED:
+                if (debug) printf("Status -> NOT_REGISTERED\n");
+
                 sendto(sock, &reg_req_pkt, sizeof(reg_req_pkt), 0,
                        (struct sockaddr*) &addr_server, sizeof(*addr_server));
+
+                if (debug) printf("Paquet enviat -> REG_REQ\n");
+
                 status = WAIT_ACK_REG;
                 break;
 
             case WAIT_ACK_REG:
+                if (debug) printf("Status -> WAIT_ACK_REG\n");
+
                 select(sock + 1, &fileDesctiptors, NULL, NULL, &tv);
                 if (FD_ISSET(sock, &fileDesctiptors)){
                     PDU rcv_pkt;
@@ -150,6 +163,7 @@ int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg) {
 
                     switch (rcv_pkt.type) {
                         case REG_ACK:
+                            if (debug) printf("Paquet rebut -> REG_ACK\n");
                             srv_info.udp_port = (int) strtol(rcv_pkt.data, NULL, 10);
                             strcpy(srv_info.comm_id, rcv_pkt.comm_id);
                             strcpy(srv_info.tx_id, rcv_pkt.tx_id);
@@ -165,39 +179,49 @@ int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg) {
                             strcpy(reg_info_pkt.tx_id, cfg->id);
                             strcpy(reg_info_pkt.comm_id, srv_info.comm_id);
 
-                            //TODO posar el camp de dades amb el port tcp i els dispositius
-                            char data[61];
+                            char data_temp[61];
+                            char elements[32];
+                            elements_to_string(elements, cfg->elemc, cfg->elements);
+                            sprintf(data_temp, "%i,%s", cfg->local_TCP, elements);
+                            if (debug) printf("Enviant paquet REG_INFO amb dades: %s", data_temp);
 
-
-                            sendto(sock2, &reg_req_pkt, sizeof(reg_req_pkt), 0,
+                            sendto(sock2, &reg_info_pkt, sizeof(reg_info_pkt), 0,
                                    (struct sockaddr*) &addr_server, sizeof(*addr_server));
+
+                            if (debug) printf("Paquet enviat -> REG_INFO\n");
 
                             status = WAIT_ACK_INFO;
                             break;
 
                         case REG_NACK:
+                            if (debug) printf("Paquet rebut -> REG_NACK\n");
                             status = NOT_REGISTERED;
                             break;
 
                         case REG_REJ:
+                            if (debug) printf("Paquet rebut -> REG_REJ\n");
                             status = NOT_REGISTERED;
                             packets = 1;
                             tv.tv_sec = t;
                             procedures++;
+                            if (debug) printf("Començant nou proces de registre (%i)\n", procedures, u);
+
                             break;
 
                         default:
-                                // TODO Preguntar al profe
+                            if (debug) printf("Paquet rebut -> DESCONEGUT\n");
                             break;
                     }
                 }else{
                     sendto(sock, &reg_req_pkt, sizeof(reg_req_pkt), 0,
                            (struct sockaddr*) &addr_server, sizeof(*addr_server));
+                    if (debug) printf("Paquet enviat -> REG_REQ\n");
                     packets++;
                 }
                 break;
 
             case WAIT_ACK_INFO:
+                if (debug) printf("Status -> WAIT_ACK_INFO\n");
                 tv.tv_sec = 2 * t;
                 select(sock2 + 1, &fileDesctiptors, NULL, NULL, &tv);
                 if (FD_ISSET(sock2, &fileDesctiptors)){
@@ -208,31 +232,32 @@ int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg) {
 
                     if (!strcmp(rcv_pkt.tx_id, srv_info.tx_id) && !strcmp(rcv_pkt.comm_id, srv_info.comm_id)){
                         // TODO falta comparar les adreces i preguntar que pasa si no coicideixen
+                        if (debug) printf("PAQUET REBUT ERRONI: comm_id o adreça no esperades\n");
+                        continue;
                     }
 
                     switch (rcv_pkt.type) {
                         case INFO_ACK:
+                            if (debug) printf("Paquet rebut -> INFO_ACK\n");
                             srv_info.tcp_port = (int) strtol(rcv_pkt.data, NULL, 10);
                             status = REGISTERED;
                             break;
 
                         case INFO_NACK:
+                            if (debug) printf("Paquet rebut -> INFO_NACK\n");
                             status = NOT_REGISTERED;
                             break;
 
                         default:
-
+                            if (debug) printf("Paquet rebut -> DESCONEGUT\n");
                             break;
                     }
-                }else{
+                }else {
                     status = NOT_REGISTERED;
                     packets = 1;
                     tv.tv_sec = t;
                     procedures++;
                 }
-                    // Si reb un ack estat a registrat i guardar port tcp guardat a dades del paquet
-
-                    // Si rep un nack el camp dades ha de contenir el motiu i sha de tornar a comencar
                 break;
 
             default:

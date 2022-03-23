@@ -57,4 +57,13 @@ void print_config(ClientCfg *cfg) {
 
 }
 
+void elements_to_string(char * str, int elemc, Element elems[elemc]) {
+    for(int i = 0; i < elemc; i++){
+        char temp[16];
+        sprintf(temp, "%s-%i-%c", elems->magnitude, elems->ordinal, elems->type);
+        if (i < elemc - 1) temp[6] = ';';
+        strcat(str, temp);
+    }
+}
+
 

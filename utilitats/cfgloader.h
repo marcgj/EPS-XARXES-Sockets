@@ -24,5 +24,5 @@ typedef struct{
 
 void load_config(char *filename, ClientCfg *clientConfig);
 void print_config(ClientCfg *clientCfg);
-
+void elements_to_string(char * str, int elemc, Element elems[elemc]) ;
 #endif //SO_PRACTICA1_CFGLOADER_H
