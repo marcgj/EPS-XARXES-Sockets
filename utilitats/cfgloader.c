@@ -38,6 +38,8 @@ void load_config(char *filename, ClientCfg *clientConfig) {
     fscanf(f, "Server = %s\n", clientConfig->address);
     fscanf(f, "Server-UDP = %i\n", &clientConfig->server_UDP);
 
+    elements_to_string(clientConfig->elements_string, clientConfig->elemc, clientConfig->elements);
+
     printf("Conf Loaded\n");
     fclose(f);
 }

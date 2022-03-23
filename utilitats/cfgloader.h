@@ -17,6 +17,8 @@ typedef struct{
     Element elements[5];
     int elemc;
 
+    char elements_string[32];
+
     int local_TCP;
     char address[64];
     int server_UDP;

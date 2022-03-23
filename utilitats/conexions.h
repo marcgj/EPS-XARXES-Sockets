@@ -5,6 +5,15 @@
 #ifndef SO_PRACTICA1_CONEXIONS_H
 #define SO_PRACTICA1_CONEXIONS_H
 
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <time.h>
+#include <string.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include "cfgloader.h"
 
@@ -29,7 +38,8 @@
 void process_args(int argc, char *argv[], char *cfgFileName);
 int configure_udp(int port);
 struct sockaddr_in sockaddr_in_generator(char * address, int port);
-int reg_procedure(int sock, struct sockaddr_in addr_server, ClientCfg *cfg);
+int reg_procedure(int sock, struct sockaddr_in addr_server);
+void register_client();
 
 
 typedef struct{
@@ -42,11 +52,9 @@ typedef struct{
 void print_PDU(PDU pdu, char * pretext);
 
 typedef struct {
+    char tx_id[11];
     char comm_id[11];
     int udp_port;
-    struct sockaddr_in server_addr;
-    int addr_long;
-    char tx_id[11];
     int tcp_port;
 } rcv_info;
 
