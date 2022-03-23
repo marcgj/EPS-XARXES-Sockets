@@ -27,8 +27,9 @@
 
 
 void process_args(int argc, char *argv[], char *cfgFileName);
-int configure_udp(char * address, int port, struct sockaddr_in *addr_server);
-int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg);
+int configure_udp(int port);
+struct sockaddr_in sockaddr_in_generator(char * address, int port);
+int reg_procedure(int sock, struct sockaddr_in addr_server, ClientCfg *cfg);
 
 typedef struct{
     unsigned char type;

@@ -61,7 +61,10 @@ void elements_to_string(char * str, int elemc, Element elems[elemc]) {
     for(int i = 0; i < elemc; i++){
         char temp[16];
         sprintf(temp, "%s-%i-%c", elems->magnitude, elems->ordinal, elems->type);
-        if (i < elemc - 1) temp[6] = ';';
+        if (i < elemc - 1) {
+            temp[7] = ';';
+            temp[8] = '\0';
+        }
         strcat(str, temp);
     }
 }
