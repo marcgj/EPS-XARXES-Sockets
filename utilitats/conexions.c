@@ -29,20 +29,17 @@ int configure_udp(int port) {
     return sock;
 }
 
-void register_client() {
+void register_client(int udpSock) {
     const int o = 3;
-    int udpSock = configure_udp(cfg.local_TCP);
     struct sockaddr_in addr_server = sockaddr_in_generator(cfg.address, cfg.server_UDP);
 
     int procedures = 0;
     while(procedures < o){
         if(reg_procedure(udpSock, addr_server) == 1){
-            close(udpSock);
             return;
         }
         if (debug) printf("Començant nou proces de registre (%i)\n", ++procedures);
     }
-    close(udpSock);
     printf("No s'ha pogut conectar amb el servidor\n");
     exit(1);
 }
@@ -57,7 +54,7 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
     struct sockaddr_in addr_rcv;
     struct sockaddr_in addr_server2 = addr_server;
 
-    PDU reg_req_pkt = generate_PDU(REG_REQ, cfg.id, ZERO_COMM_ID, "");
+    PDU_UDP reg_req_pkt = generate_PDU_UDP(REG_REQ, cfg.id, ZERO_COMM_ID, "");
 
     tv.tv_sec = t;
     tv.tv_usec = 0;
@@ -92,7 +89,7 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                 FD_SET(sock, &fileDesctiptors);
                 select(sock + 1, &fileDesctiptors, NULL, NULL, &tv);
                 if (FD_ISSET(sock, &fileDesctiptors)){
-                    PDU rcv_pkt;
+                    PDU_UDP rcv_pkt;
                     recvfrom(sock, &rcv_pkt, sizeof(rcv_pkt), 0, (struct sockaddr *) &addr_rcv, NULL);
 
                     switch (rcv_pkt.type) {
@@ -105,7 +102,7 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
 
                             addr_server2.sin_port = htons(srv_info.udp_port);
 
-                            PDU reg_info_pkt = generate_PDU(REG_INFO, cfg.id, srv_info.comm_id, "");
+                            PDU_UDP reg_info_pkt = generate_PDU_UDP(REG_INFO, cfg.id, srv_info.comm_id, "");
                             sprintf(reg_info_pkt.data, "%i,%s", cfg.local_TCP, cfg.elements_string);
 
                             if (sendto(sock, &reg_info_pkt, sizeof(reg_info_pkt), 0,
@@ -148,7 +145,7 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                 FD_SET(sock, &fileDesctiptors);
                 select(sock + 1, &fileDesctiptors, NULL, NULL, &tv);
                 if (FD_ISSET(sock, &fileDesctiptors)){
-                    PDU rcv_pkt;
+                    PDU_UDP rcv_pkt;
                     recvfrom(sock, &rcv_pkt, sizeof(rcv_pkt), 0, (struct sockaddr*) &addr_rcv,
                              NULL);
 
@@ -206,12 +203,12 @@ struct sockaddr_in sockaddr_in_generator(char *address, int port) {
     return result;
 }
 
-void print_PDU(PDU pdu, char * pretext) {
+void print_PDU(PDU_UDP pdu, char * pretext) {
     printf("%s // \t TYPE= %i \t TX_ID= %s\t COMM_ID= %s\t DATA= %s\n", pretext, pdu.type ,pdu.tx_id, pdu.comm_id, pdu.data);
 }
 
-PDU generate_PDU(unsigned char type, char tx_id[11], char comm_id[11], char data[61]) {
-    PDU pdu;
+PDU_UDP generate_PDU_UDP(unsigned char type, char tx_id[11], char comm_id[11], char data[61]) {
+    PDU_UDP pdu;
     pdu.type = type;
     strcpy(pdu.tx_id, tx_id);
     strcpy(pdu.comm_id, comm_id);
@@ -220,18 +217,26 @@ PDU generate_PDU(unsigned char type, char tx_id[11], char comm_id[11], char data
     return pdu;
 }
 
-void start_alive_service() {
+void sig_usr(int signo){
+    if(signo == SIGUSR1){
+        status = NOT_REGISTERED;
+    }
+}
+
+void start_alive_service(int sock, int t) {
+    signal(SIGUSR1,sig_usr);
     int parent_pid = getpid();
     int pid = fork();
 
     if(pid == 0){
-        const int r = 2, s = 3;
+        const int s = 3;
         int missing_alives = 0;
 
-        int sock = configure_udp(cfg.local_TCP);
-
         while (missing_alives < s){
-            if (send_wait_ALIVE(r, sock) < 0) missing_alives++;
+            sleep(t);
+            int code = send_wait_ALIVE(sock, t);
+            if (code == -1) missing_alives++;
+            else if (code == -2) break;
             else missing_alives = 0;
         }
 
@@ -245,10 +250,11 @@ void start_alive_service() {
 
 }
 
-int send_wait_ALIVE(int t, int sock){
-    const PDU alive_pkt = generate_PDU(ALIVE, cfg.id, srv_info.comm_id, "");
-    PDU rcv_pkt;
-    const struct sockaddr_in addr_srv = sockaddr_in_generator(cfg.address, srv_info.udp_port);
+int send_wait_ALIVE(int sock, int t){
+    const PDU_UDP alive_pkt = generate_PDU_UDP(ALIVE, cfg.id, srv_info.comm_id, "");
+
+    PDU_UDP rcv_pkt;
+    const struct sockaddr_in addr_srv = sockaddr_in_generator(cfg.address, cfg.server_UDP);
 
     fd_set fileDesctiptors;
     struct timeval tv = {t, 0};
@@ -268,21 +274,20 @@ int send_wait_ALIVE(int t, int sock){
         if (strcmp(rcv_pkt.tx_id, srv_info.tx_id) != 0 ||
             strcmp(rcv_pkt.comm_id, srv_info.comm_id) != 0) {
             print_PDU(rcv_pkt, "REBUT PAQUET ERRONI");
-            return -1;
+            return -2;
         }
 
         switch (rcv_pkt.type) {
             case ALIVE:
                 if (debug) print_PDU(rcv_pkt, "REBUT ALIVE");
                 if (strcmp(rcv_pkt.data, cfg.id) != 0) {
-                    if (debug) printf("ALIVE REBUT NO CONTE LA ID\n");
-                    return -1;
-                }
-                return 0;
+                    if (debug) printf("ERROR: ALIVE REBUT NO CONTE LA ID\n");
+                    return -2;
+                }else return 0;
 
             case ALIVE_REJ:
                 if (debug) print_PDU(rcv_pkt, "REBUT ALIVE_REJ");
-                return -1;
+                return -2;
         }
     }else{
         if (debug) fprintf(stderr, "NO s'ha rebut l'ALIVE\n");

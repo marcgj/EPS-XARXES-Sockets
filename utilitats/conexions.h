@@ -41,24 +41,33 @@
 #define ZERO_COMM_ID "0000000000"
 
 
-void process_args(int argc, char *argv[], char *cfgFileName);
+void handle_args(int argc, char *argv[], char *cfgFileName);
 int configure_udp(int port);
 struct sockaddr_in sockaddr_in_generator(char * address, int port);
 int reg_procedure(int sock, struct sockaddr_in addr_server);
-void register_client();
+void register_client(int udpSock);
 
-int send_wait_ALIVE(int t, int sock);
-void start_alive_service();
+int send_wait_ALIVE(int sock, int t);
+void start_alive_service(int sock, int t);
 
 typedef struct{
     unsigned char type;
     char tx_id[11];
     char comm_id[11];
     char data[61];
-}PDU;
+}PDU_UDP;
 
-PDU generate_PDU(unsigned char type, char tx_id[11], char comm_id[11], char data[61]);
-void print_PDU(PDU pdu, char * pretext);
+typedef struct{
+    unsigned char type;
+    char tx_id[11];
+    char comm_id[11];
+    char element[8];
+    char value[16];
+    char info[80];
+}PDU_TCP;
+
+PDU_UDP generate_PDU_UDP(unsigned char type, char tx_id[11], char comm_id[11], char data[61]);
+void print_PDU(PDU_UDP pdu, char * pretext);
 
 typedef struct {
     char tx_id[11];

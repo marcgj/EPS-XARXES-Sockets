@@ -5,11 +5,8 @@
 #ifndef SO_PRACTICA1_CFGLOADER_H
 #define SO_PRACTICA1_CFGLOADER_H
 
-typedef struct{
-    char magnitude[3];
-    int ordinal;
-    char type;
-} Element;
+
+#include "elemcontroller.h"
 
 typedef struct{
     char id[10];

@@ -9,8 +9,6 @@
 #include <stdlib.h>
 
 void load_config(char *filename, ClientCfg *clientConfig) {
-    system("pwd");
-
     FILE *f = fopen(filename, "r");
     if (f == NULL){
         fprintf(stderr, "Error obrint arxiu %s: ", filename);
@@ -21,16 +19,21 @@ void load_config(char *filename, ClientCfg *clientConfig) {
     fscanf(f, "Id = %s\n", clientConfig->id);
 
     fscanf(f, "Elements = ");
-    for(int elem = 0, eol = 0; elem < 5 && !eol; elem++){
-        fscanf(f, "%3s-", clientConfig->elements[elem].magnitude);
-        fscanf(f, "%d-", &clientConfig->elements[elem].ordinal);
-        fscanf(f, "%c", &clientConfig->elements[elem].type);
+    for(int i = 0, eol = 0; i < 5 && !eol; i++){
+        Element * elem = &clientConfig->elements[i];
+        fscanf(f, "%3s-", elem->magnitude);
+        fscanf(f, "%d-", &elem->ordinal);
+        fscanf(f, "%c", &elem->type);
+        strcpy(clientConfig->elements[i].value, "NONE");
+
+
+        sprintf(elem->elem_string, "%s-%d-%c", elem->magnitude, elem->ordinal, elem->type);
 
         char c;
         fscanf(f, "%c", &c);
         if (c != ';') {
             eol = 1;
-            clientConfig->elemc = elem+1;
+            clientConfig->elemc = i + 1;
         }
     }
 
@@ -40,21 +43,17 @@ void load_config(char *filename, ClientCfg *clientConfig) {
 
     elements_to_string(clientConfig->elements_string, clientConfig->elemc, clientConfig->elements);
 
-    printf("Conf Loaded\n");
+    printf("CONFIGURACIO CARGADA\n");
     fclose(f);
 }
 
 void print_config(ClientCfg *cfg) {
-    printf("---------- Client Config ----------\n");
-    printf("Id: %s \n", cfg->id);
-    printf("Address: %s \n", cfg->address);
-    printf("TCP: %i\n", cfg->local_TCP);
-    printf("UDP: %d \n\n", cfg->server_UDP);
-    for (int i = 0; i < cfg->elemc; ++i) {
-        printf("Mag: %s ", cfg->elements[i].magnitude);
-        printf("Ord: %i ", cfg->elements[i].ordinal);
-        printf("Type: %c \n", cfg->elements[i].type);
-    }
+    printf("---------- DADES DISPOSITIU ----------\n");
+    printf(" Id: %s \n", cfg->id);
+    printf(" Address: %s \n", cfg->address);
+    printf(" TCP: %i\n", cfg->local_TCP);
+    printf(" UDP: %d \n\n", cfg->server_UDP);
+    print_elements(cfg->elemc, cfg->elements);
     printf("-----------------------------------");
 
 }
