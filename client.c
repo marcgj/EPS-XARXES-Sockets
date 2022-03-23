@@ -11,6 +11,8 @@
 #include <string.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <sys/wait.h>
+
 
 #include "utilitats/cfgloader.h"
 #include "utilitats/conexions.h"
@@ -32,6 +34,9 @@ int main(int argc, char *argv[]){
     if (debug) print_config(&cfg);
 
     register_client();
+    start_alive_service();
+
+    wait(NULL);
 }
 
 

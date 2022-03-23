@@ -34,6 +34,12 @@
 #define REGISTERED 0xf5
 #define SEND_ALIVE 0xf6
 
+#define ALIVE 0xb0
+#define ALIVE_NACK 0xb1
+#define ALIVE_REJ 0xb2
+
+#define ZERO_COMM_ID "0000000000"
+
 
 void process_args(int argc, char *argv[], char *cfgFileName);
 int configure_udp(int port);
@@ -41,6 +47,8 @@ struct sockaddr_in sockaddr_in_generator(char * address, int port);
 int reg_procedure(int sock, struct sockaddr_in addr_server);
 void register_client();
 
+int send_wait_ALIVE(int t, int sock);
+void start_alive_service();
 
 typedef struct{
     unsigned char type;
@@ -49,6 +57,7 @@ typedef struct{
     char data[61];
 }PDU;
 
+PDU generate_PDU(unsigned char type, char tx_id[11], char comm_id[11], char data[61]);
 void print_PDU(PDU pdu, char * pretext);
 
 typedef struct {

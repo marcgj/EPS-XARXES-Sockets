@@ -37,10 +37,12 @@ void register_client() {
     int procedures = 0;
     while(procedures < o){
         if(reg_procedure(udpSock, addr_server) == 1){
+            close(udpSock);
             return;
         }
         if (debug) printf("Començant nou proces de registre (%i)\n", ++procedures);
     }
+    close(udpSock);
     printf("No s'ha pogut conectar amb el servidor\n");
     exit(1);
 }
@@ -55,10 +57,7 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
     struct sockaddr_in addr_rcv;
     struct sockaddr_in addr_server2 = addr_server;
 
-    PDU reg_req_pkt;
-    reg_req_pkt.type = REG_REQ;
-    strcpy(reg_req_pkt.comm_id, "0000000000");
-    strcpy(reg_req_pkt.tx_id, cfg.id);
+    PDU reg_req_pkt = generate_PDU(REG_REQ, cfg.id, ZERO_COMM_ID, "");
 
     tv.tv_sec = t;
     tv.tv_usec = 0;
@@ -84,7 +83,6 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                 }else{
                     if (debug) print_PDU(reg_req_pkt, "ENVIAT REG_REQ");
                 }
-
                 status = WAIT_ACK_REG;
                 break;
 
@@ -105,11 +103,9 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                             strcpy(srv_info.comm_id, rcv_pkt.comm_id);
                             strcpy(srv_info.tx_id, rcv_pkt.tx_id);
 
-                            PDU reg_info_pkt;
-                            reg_info_pkt.type = REG_INFO;
                             addr_server2.sin_port = htons(srv_info.udp_port);
-                            strcpy(reg_info_pkt.tx_id, cfg.id);
-                            strcpy(reg_info_pkt.comm_id, srv_info.comm_id);
+
+                            PDU reg_info_pkt = generate_PDU(REG_INFO, cfg.id, srv_info.comm_id, "");
                             sprintf(reg_info_pkt.data, "%i,%s", cfg.local_TCP, cfg.elements_string);
 
                             if (sendto(sock, &reg_info_pkt, sizeof(reg_info_pkt), 0,
@@ -118,7 +114,6 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                             }else{
                                 if (debug) print_PDU(reg_info_pkt, "ENVIAT REG_INFO");
                             }
-
                             status = WAIT_ACK_INFO;
                             break;
 
@@ -188,7 +183,6 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
 
             default:
                 break;
-
         }
         if (debug) printf("/////////////////////////////////////////////////////////////////////////////////////////\n");
     }
@@ -215,3 +209,87 @@ struct sockaddr_in sockaddr_in_generator(char *address, int port) {
 void print_PDU(PDU pdu, char * pretext) {
     printf("%s // \t TYPE= %i \t TX_ID= %s\t COMM_ID= %s\t DATA= %s\n", pretext, pdu.type ,pdu.tx_id, pdu.comm_id, pdu.data);
 }
+
+PDU generate_PDU(unsigned char type, char tx_id[11], char comm_id[11], char data[61]) {
+    PDU pdu;
+    pdu.type = type;
+    strcpy(pdu.tx_id, tx_id);
+    strcpy(pdu.comm_id, comm_id);
+    strcpy(pdu.data, data);
+
+    return pdu;
+}
+
+void start_alive_service() {
+    int parent_pid = getpid();
+    int pid = fork();
+
+    if(pid == 0){
+        const int r = 2, s = 3;
+        int missing_alives = 0;
+
+        int sock = configure_udp(cfg.local_TCP);
+
+        while (missing_alives < s){
+            if (send_wait_ALIVE(r, sock) < 0) missing_alives++;
+            else missing_alives = 0;
+        }
+
+        close(sock);
+        kill(parent_pid, SIGUSR1);
+        exit(1);
+    }else if(pid < 0){
+        perror("Error creant process alives");
+        exit(1);
+    }
+
+}
+
+int send_wait_ALIVE(int t, int sock){
+    const PDU alive_pkt = generate_PDU(ALIVE, cfg.id, srv_info.comm_id, "");
+    PDU rcv_pkt;
+    const struct sockaddr_in addr_srv = sockaddr_in_generator(cfg.address, srv_info.udp_port);
+
+    fd_set fileDesctiptors;
+    struct timeval tv = {t, 0};
+
+    if (sendto(sock, &alive_pkt, sizeof(alive_pkt), 0,
+               (struct sockaddr*) &addr_srv, sizeof(addr_srv)) < 0)
+    {
+        perror("Error send ALIVE");
+    }else{
+        if (debug) print_PDU(alive_pkt, "ENVIAT ALIVE");
+    }
+
+    FD_SET(sock, &fileDesctiptors);
+    select(sock + 1, &fileDesctiptors, NULL, NULL, &tv);
+    if (FD_ISSET(sock, &fileDesctiptors)) {
+        recvfrom(sock, &rcv_pkt, sizeof(rcv_pkt), 0, NULL, NULL);
+        if (strcmp(rcv_pkt.tx_id, srv_info.tx_id) != 0 ||
+            strcmp(rcv_pkt.comm_id, srv_info.comm_id) != 0) {
+            print_PDU(rcv_pkt, "REBUT PAQUET ERRONI");
+            return -1;
+        }
+
+        switch (rcv_pkt.type) {
+            case ALIVE:
+                if (debug) print_PDU(rcv_pkt, "REBUT ALIVE");
+                if (strcmp(rcv_pkt.data, cfg.id) != 0) {
+                    if (debug) printf("ALIVE REBUT NO CONTE LA ID\n");
+                    return -1;
+                }
+                return 0;
+
+            case ALIVE_REJ:
+                if (debug) print_PDU(rcv_pkt, "REBUT ALIVE_REJ");
+                return -1;
+        }
+    }else{
+        if (debug) fprintf(stderr, "NO s'ha rebut l'ALIVE\n");
+        return -1;
+    }
+}
+
+
+
+
