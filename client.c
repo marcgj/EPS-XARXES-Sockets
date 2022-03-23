@@ -10,6 +10,7 @@
 #include <time.h>
 #include <string.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 
 #include "utilitats/cfgloader.h"
 #include "utilitats/conexions.h"
@@ -22,7 +23,6 @@ unsigned char status = DISCONNECTED;
 
 rcv_info srv_info;
 
-
 int main(int argc, char *argv[]){
     char cfgFileName[16] = DEFAULT_CFG;
 
@@ -34,16 +34,9 @@ int main(int argc, char *argv[]){
 
     struct sockaddr_in addr_server;
 
-    struct hostent * ent = gethostbyname(cfg.address);
-    if (!ent){
-        printf("Error! No trobat: %s \n", cfg.address);
-        exit(-1);
-    }
-    int udpSock = configure_udp((((struct in_addr *) ent -> h_addr) -> s_addr),
-            cfg.server_UDP, &addr_server);
+    int udpSock = configure_udp(cfg.address,cfg.server_UDP, &addr_server);
 
     reg_procedure(udpSock, &addr_server, &cfg);
-
 }
 
 
@@ -64,6 +57,11 @@ void process_args(int argc, char **argv, char * cfgFileName) {
                     strcpy(cfgFileName, argv[i+1]);
                     i += 2;
                     break;
+
+                default:
+                    perror("Parametre no reconegut\n");
+                    exit(1);
+                    break;
             }
         }
         if (debug) printf("Config File Selected: %s\n", cfgFileName);
@@ -71,18 +69,26 @@ void process_args(int argc, char **argv, char * cfgFileName) {
 
 }
 
+int configure_udp(char * address, int port, struct sockaddr_in *addr_server) {
+    if (debug) printf("\nObrint socket UDP amb adreça %s i port %i\n", address, port);
 
-int configure_udp(in_addr_t s_addr, int port, struct sockaddr_in *addr_server) {
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
+
     if(sock < 0){
         perror("Error creant el socket");
+        exit(1);
+    }
+
+    struct hostent * ent = gethostbyname(address);
+
+    if (!ent){
+        printf("Error! No trobat: %s \n", address);
         exit(-1);
     }
 
-
     addr_server->sin_family = AF_INET;
     addr_server->sin_port = htons(port);
-    addr_server->sin_addr.s_addr = s_addr;
+    addr_server->sin_addr.s_addr = (((struct in_addr *) ent -> h_addr) -> s_addr);
 
     if(bind(sock,(struct sockaddr*) &addr_server, sizeof(*addr_server)) < 0){
         perror("Error bind");
@@ -93,13 +99,14 @@ int configure_udp(in_addr_t s_addr, int port, struct sockaddr_in *addr_server) {
 }
 
 int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg) {
+    if (debug) printf("Inici proces de registre\n");
+
     int const t = 1, u = 2, n = 8, o = 3, p = 2, q = 4;
-    int packets = 0, procedures = 0;
+    int packets = 1, procedures = 0;
 
     fd_set fileDesctiptors;
     struct timeval tv;
 
-    rcv_info srv_info;
     int sock2;
     struct sockaddr_in addr_server2 = *addr_server;
 
@@ -107,7 +114,6 @@ int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg) {
     reg_req_pkt.type = REG_REQ;
     strcpy(reg_req_pkt.tx_id, cfg->id);
 
-    packets = 1;
     tv.tv_sec = t;
     tv.tv_usec = 0;
 
@@ -148,8 +154,11 @@ int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg) {
                             strcpy(srv_info.comm_id, rcv_pkt.comm_id);
                             strcpy(srv_info.tx_id, rcv_pkt.tx_id);
 
-                            sock2 = configure_udp(srv_info.server_addr.sin_addr.s_addr,
-                                    srv_info.udp_port, &addr_server2);
+                            char adress[INET_ADDRSTRLEN];
+
+                            inet_ntop(AF_INET, &srv_info.server_addr.sin_addr, adress, sizeof(adress));
+
+                            sock2 = configure_udp(adress,srv_info.udp_port, &addr_server2);
 
                             PDU reg_info_pkt;
                             reg_info_pkt.type = REG_INFO;
@@ -157,6 +166,8 @@ int reg_procedure(int sock, struct sockaddr_in *addr_server, ClientCfg *cfg) {
                             strcpy(reg_info_pkt.comm_id, srv_info.comm_id);
 
                             //TODO posar el camp de dades amb el port tcp i els dispositius
+                            char data[61];
+
 
                             sendto(sock2, &reg_req_pkt, sizeof(reg_req_pkt), 0,
                                    (struct sockaddr*) &addr_server, sizeof(*addr_server));
