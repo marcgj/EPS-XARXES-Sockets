@@ -23,6 +23,8 @@
 int debug = 0;
 unsigned char status = NOT_REGISTERED;
 
+int pids[3];
+
 void print_elements(int elemc, Element *elements) {
     printf("   Parametres \t Valors\n");
     printf("   ----------- \t ------------------\n");
@@ -59,7 +61,6 @@ int main(int argc, char *argv[]){
                 else status = NOT_REGISTERED;
                 break;
             case SEND_ALIVE:
-
                 FD_SET(STDIN_FILENO, &fileDesctiptors);
                 select(STDIN_FILENO + 1, &fileDesctiptors, NULL, NULL, NULL);
                 if (FD_ISSET(STDIN_FILENO, &fileDesctiptors)){

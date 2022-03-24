@@ -7,6 +7,7 @@ extern int debug;
 extern unsigned char status;
 extern ClientCfg cfg;
 extern rcv_info srv_info;
+extern int pids[3];
 
 int configure_udp(int port) {
     if (debug) printf("\nObrint socket UDP amb port %i\n", port);
@@ -247,7 +248,7 @@ void start_alive_service(int sock, int t) {
         perror("Error creant process alives");
         exit(1);
     }
-
+    pids[0] = pid;
 }
 
 int send_wait_ALIVE(int sock, int t){

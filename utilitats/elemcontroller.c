@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <wait.h>
 #include "elemcontroller.h"
 #include "cfgloader.h"
 
@@ -14,6 +15,7 @@ extern int debug;
 extern unsigned char status;
 extern ClientCfg cfg;
 
+extern int pids[3];
 
 Element *getElement(ClientCfg * c, char * str) {
     for(int i = 0; i < c->elemc; i++){
@@ -62,7 +64,9 @@ void handle_terminal() {
         }else if (strcmp(token, "send") == 0){
 
         }else if (strcmp(token, "quit") == 0){
-
+            kill(pids[0], SIGKILL);
+            wait(NULL);
+            exit(0);
         }else{
             fprintf(stderr, "La comanda %s no es acceptada\n", token);
         }
