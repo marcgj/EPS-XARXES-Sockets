@@ -1,6 +1,3 @@
-import socket
-
-
 class ServerCfg:
     # Possible millora: fer anar configparser
     def __init__(self, filename: str):
@@ -8,7 +5,7 @@ class ServerCfg:
 
         processed = []
         for line in f:
-            line = line.rsplit() # Elimina possible \n del final
+            line = line.rsplit()  # Elimina possible \n del final
             if line:
                 processed.append(line[-1])
 

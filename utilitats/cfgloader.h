@@ -6,9 +6,19 @@
 #define SO_PRACTICA1_CFGLOADER_H
 
 
+#include <string.h>
 #include "elemcontroller.h"
 
-typedef struct{
+typedef struct {
+    char magnitude[3];
+    int ordinal;
+    char type;
+
+    char value[15];
+    char elem_string[32];
+} Element;
+
+typedef struct {
     char id[10];
 
     Element elements[5];
@@ -21,7 +31,15 @@ typedef struct{
     int server_UDP;
 } ClientCfg;
 
+Element *getElement(ClientCfg *c, char *str);
+
 void load_config(char *filename, ClientCfg *clientConfig);
+
 void print_config(ClientCfg *clientCfg);
-void elements_to_string(char * str, int elemc, Element elems[elemc]) ;
+
+void elements_to_string(char *str, int elemc, Element elems[elemc]);
+
+void print_elements(int elemc, Element elements[elemc]);
+
+
 #endif //SO_PRACTICA1_CFGLOADER_H

@@ -38,36 +38,54 @@
 #define ALIVE_NACK 0xb1
 #define ALIVE_REJ 0xb2
 
+#define SEND_DATA 0xc0
+#define DATA_ACK 0xc1
+#define DATA_NACK 0xc2
+#define DATA_REJ 0xc3
+#define SET_DATA 0xc4
+#define GET_DATA 0xc5
+
+
 #define ZERO_COMM_ID "0000000000"
 
 
 void handle_args(int argc, char *argv[], char *cfgFileName);
+
 int configure_udp(int port);
-struct sockaddr_in sockaddr_in_generator(char * address, int port);
+
+int configure_tcp(int port);
+
+struct sockaddr_in sockaddr_in_generator(char *address, int port);
+
 int reg_procedure(int sock, struct sockaddr_in addr_server);
+
 void register_client(int udpSock);
 
 int send_wait_ALIVE(int sock, int t);
+
 void start_alive_service(int sock, int t);
 
-typedef struct{
+void send_element(Element elem);
+
+typedef struct {
     unsigned char type;
     char tx_id[11];
     char comm_id[11];
     char data[61];
-}PDU_UDP;
+} PDU_UDP;
 
-typedef struct{
+typedef struct {
     unsigned char type;
     char tx_id[11];
     char comm_id[11];
     char element[8];
     char value[16];
     char info[80];
-}PDU_TCP;
+} PDU_TCP;
 
-PDU_UDP generate_PDU_UDP(unsigned char type, char tx_id[11], char comm_id[11], char data[61]);
-void print_PDU(PDU_UDP pdu, char * pretext);
+PDU_UDP generate_PDU_UDP(unsigned char type, char *tx_id, char *comm_id, char *data);
+
+void print_PDU_UDP(PDU_UDP pdu, char *pretext);
 
 typedef struct {
     char tx_id[11];
@@ -75,5 +93,8 @@ typedef struct {
     int udp_port;
     int tcp_port;
 } rcv_info;
+
+
+void handle_incoming_connection(int sock);
 
 #endif //SO_PRACTICA1_CONEXIONS_H

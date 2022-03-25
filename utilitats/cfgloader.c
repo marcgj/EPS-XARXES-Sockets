@@ -7,20 +7,21 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 void load_config(char *filename, ClientCfg *clientConfig) {
     FILE *f = fopen(filename, "r");
-    if (f == NULL){
+    if (f == NULL) {
         fprintf(stderr, "Error obrint arxiu %s: ", filename);
         perror("");
-        exit(1);
+        kill(0, SIGTERM);
     }
 
     fscanf(f, "Id = %s\n", clientConfig->id);
 
     fscanf(f, "Elements = ");
-    for(int i = 0, eol = 0; i < 5 && !eol; i++){
-        Element * elem = &clientConfig->elements[i];
+    for (int i = 0, eol = 0; i < 5 && !eol; i++) {
+        Element *elem = &clientConfig->elements[i];
         fscanf(f, "%3s-", elem->magnitude);
         fscanf(f, "%d-", &elem->ordinal);
         fscanf(f, "%c", &elem->type);
@@ -58,15 +59,33 @@ void print_config(ClientCfg *cfg) {
 
 }
 
-void elements_to_string(char * str, int elemc, Element elems[elemc]) {
-    for(int i = 0; i < elemc; i++){
+void elements_to_string(char *str, int elemc, Element elems[elemc]) {
+    for (int i = 0; i < elemc; i++) {
         char temp[16];
-        sprintf(temp, "%s-%i-%c", elems->magnitude, elems->ordinal, elems->type);
+        Element elem = elems[i];
+        sprintf(temp, "%s-%i-%c", elem.magnitude, elem.ordinal, elem.type);
         if (i < elemc - 1) {
             temp[7] = ';';
             temp[8] = '\0';
         }
         strcat(str, temp);
+    }
+}
+
+Element *getElement(ClientCfg *c, char *str) {
+    for (int i = 0; i < c->elemc; i++) {
+        Element *elem = &c->elements[i];
+        if (strcmp(str, elem->elem_string) == 0) return elem;
+    }
+    return NULL;
+}
+
+void print_elements(int elemc, Element elements[elemc]) {
+    printf("   Parametres \t Valors\n");
+    printf("   ----------- \t ------------------\n");
+    for (int i = 0; i < elemc; ++i) {
+        Element elem = elements[i];
+        printf("   %s \t\t %s\n", elem.elem_string, elem.value);
     }
 }
 
