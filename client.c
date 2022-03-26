@@ -11,13 +11,13 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 
-#include "moduls/headers/config.h"
-#include "moduls/globals.h"
-#include "moduls/headers/socket.h"
-#include "moduls/headers/register.h"
-#include "moduls/headers/alive.h"
-#include "moduls/headers/terminal.h"
-#include "moduls/headers/sendrecive.h"
+#include "modules/headers/config.h"
+#include "modules/globals.h"
+#include "modules/headers/socket.h"
+#include "modules/headers/register.h"
+#include "modules/headers/alive.h"
+#include "modules/headers/terminal.h"
+#include "modules/headers/sendrecive.h"
 
 
 #define DEFAULT_CFG "../client.cfg"

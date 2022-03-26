@@ -46,6 +46,7 @@ int configure_socket(int port, int type){
         kill(0, SIGTERM);
     }
 
+    return sock;
 }
 
 int configure_udp(int port) {
