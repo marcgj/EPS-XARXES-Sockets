@@ -25,7 +25,7 @@ void register_client(int udpSock) {
         if (reg_procedure(udpSock, addr_server) == 1) {
             return;
         }
-       ++procedures;
+        ++procedures;
     }
     print_error("No s'ha pogut conectar amb el servidor\n");
     exit(1);

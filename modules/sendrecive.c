@@ -22,7 +22,7 @@ int is_valid_element(PDU_TCP inpkt, PDU_TCP outpkg) {
     return 1;
 }
 
-int id_in_info(PDU_TCP inpkt, char * id) {
+int id_in_info(PDU_TCP inpkt, char *id) {
     if (strcmp(inpkt.element, id) != 0) return 0;
     return 1;
 }

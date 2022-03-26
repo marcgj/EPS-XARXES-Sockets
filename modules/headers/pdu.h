@@ -29,10 +29,13 @@ typedef struct {
 } PDU_TCP;
 
 void print_PDU_UDP(PDU_UDP pdu, char *pretext);
+
 void print_PDU_TCP(PDU_TCP pdu, char *pretext);
+
 void print_pdu(void *pdu, int stype, char *pretext);
 
 void send_pdu_TCP(int sock, PDU_TCP pdu, char *label);
+
 void send_pdu_UDP(int sock, PDU_UDP pdu, struct sockaddr_in addr, char *label);
 
 

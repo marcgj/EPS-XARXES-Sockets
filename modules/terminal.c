@@ -71,8 +71,8 @@ void handle_terminal() {
 
 }
 
-void print(FILE * fd, char *tag, char * format, va_list args, ...){
-    if(args == NULL){
+void print(FILE *fd, char *tag, char *format, va_list args, ...) {
+    if (args == NULL) {
         va_start(args, args);
     }
     char buffer[264] = "";
@@ -95,7 +95,7 @@ void print_error(char *format, ...) {
 
 
 void print_debug(char *format, ...) {
-    if(!debug) return;
+    if (!debug) return;
 
     va_list args;
     va_start(args, format);
