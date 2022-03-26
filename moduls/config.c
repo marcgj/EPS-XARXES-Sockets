@@ -2,19 +2,18 @@
 // Created by Marc Gaspà Joval on 2/3/22.
 //
 
-#include "cfgloader.h"
-
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
+#include <string.h>
+
+#include "headers/config.h"
 
 void load_config(char *filename, ClientCfg *clientConfig) {
     FILE *f = fopen(filename, "r");
     if (f == NULL) {
         fprintf(stderr, "Error obrint arxiu %s: ", filename);
         perror("");
-        kill(0, SIGTERM);
+        exit(1);
     }
 
     fscanf(f, "Id = %s\n", clientConfig->id);

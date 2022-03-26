@@ -2,19 +2,14 @@
 // Created by fedora on 23/3/22.
 //
 
-#include <unistd.h>
 #include <signal.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <wait.h>
-#include "elemcontroller.h"
-#include "cfgloader.h"
-#include "conexions.h"
 
-extern int debug;
-extern unsigned char status;
-extern ClientCfg cfg;
+#include "headers/config.h"
+#include "headers/globals.h"
+#include "headers/sendrecive.h"
+#include "headers/terminal.h"
 
 void handle_terminal() {
     char buffer[128];

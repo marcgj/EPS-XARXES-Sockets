@@ -5,10 +5,6 @@
 #ifndef SO_PRACTICA1_CFGLOADER_H
 #define SO_PRACTICA1_CFGLOADER_H
 
-
-#include <string.h>
-#include "elemcontroller.h"
-
 typedef struct {
     char magnitude[3];
     int ordinal;
@@ -31,15 +27,14 @@ typedef struct {
     int server_UDP;
 } ClientCfg;
 
-Element *getElement(ClientCfg *c, char *str);
-
 void load_config(char *filename, ClientCfg *clientConfig);
 
 void print_config(ClientCfg *clientCfg);
 
+Element *getElement(ClientCfg *c, char *str);
+
 void elements_to_string(char *str, int elemc, Element elems[elemc]);
 
 void print_elements(int elemc, Element elements[elemc]);
-
 
 #endif //SO_PRACTICA1_CFGLOADER_H

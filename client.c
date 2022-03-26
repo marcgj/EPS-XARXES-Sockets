@@ -6,39 +6,25 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
 #include <time.h>
 #include <string.h>
-#include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
+#include "moduls/headers/config.h"
+#include "moduls/headers/globals.h"
+#include "moduls/headers/socket.h"
+#include "moduls/headers/register.h"
+#include "moduls/headers/alive.h"
+#include "moduls/headers/terminal.h"
+#include "moduls/headers/sendrecive.h"
 
-
-#include "utilitats/cfgloader.h"
-#include "utilitats/conexions.h"
-#include "utilitats/elemcontroller.h"
 
 #define DEFAULT_CFG "../client.cfg"
 
 
-int debug = 0;
-unsigned char status = NOT_REGISTERED;
+void handle_args(int argc, char *argv[], char *cfgFileName);
 
-ClientCfg cfg;
-rcv_info srv_info;
-int end = 0;
-
-int udpSocket;
-int tcpSock;
-
-void sigterm(int s) {
-    if (s == SIGTERM){
-        kill(0, SIGUSR1);
-        while (wait(NULL) != -1) printf("Fill tancat\n");
-        exit(0);
-    }
-}
-//send LUM-0-O
+void sigterm(int s);
 
 int main(int argc, char *argv[]) {
     signal(SIGTERM, sigterm);
@@ -88,8 +74,6 @@ int main(int argc, char *argv[]) {
         }
 
     }
-    wait(NULL);
-    wait(NULL);
 }
 
 
@@ -119,6 +103,14 @@ void handle_args(int argc, char **argv, char *cfgFileName) {
         if (debug) printf("Config File Selected: %s\n", cfgFileName);
     }
 
+}
+
+void sigterm(int s) {
+    if (s == SIGTERM) {
+        kill(0, SIGUSR1);
+        while (wait(NULL) != -1) printf("Fill tancat\n");
+        exit(0);
+    }
 }
 
 
