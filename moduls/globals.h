@@ -6,8 +6,8 @@
 #ifndef XARXES_PRACTICA1_GLOBALS_H
 #define XARXES_PRACTICA1_GLOBALS_H
 
-#include "config.h"
-#include "conexions.h"
+#include "headers/config.h"
+#include "headers/conexions.h"
 
 // TODO preguntar per les macros que no es fan anar
 

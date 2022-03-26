@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "headers/conexions.h"
-#include "headers/globals.h"
+#include "globals.h"
 #include "headers/pdu.h"
 
 

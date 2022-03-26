@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "headers/globals.h"
+#include "globals.h"
 #include "headers/socket.h"
 
 struct sockaddr_in sockaddr_in_generator(char *address, int port) {
@@ -25,14 +25,14 @@ struct sockaddr_in sockaddr_in_generator(char *address, int port) {
     return result;
 }
 
-int configure_udp(int port) {
-    if (debug) printf("\nObrint socket UDP amb port %i\n", port);
+
+int configure_socket(int port, int type){
     struct sockaddr_in addr;
-    int sock = socket(AF_INET, SOCK_DGRAM, 0);
+    int sock = socket(AF_INET, type, 0);
 
     if (sock < 0) {
         perror("Error creant el socket");
-        kill(0, SIGTERM);
+        exit(1);
     }
 
     const int true = 1;
@@ -46,29 +46,16 @@ int configure_udp(int port) {
         kill(0, SIGTERM);
     }
 
-    return sock;
+}
+
+int configure_udp(int port) {
+    if (debug) printf("\nObrint socket UDP amb port %i\n", port);
+
+    return configure_socket(port, SOCK_DGRAM);
 }
 
 int configure_tcp(int port) {
     if (debug) printf("\nObrint socket TCP amb port %i\n", port);
 
-    struct sockaddr_in addr;
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
-        perror("Error creant el socket");
-        kill(0, SIGTERM);
-    }
-    const int true = 1;
-    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &true, sizeof(true));
-
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-        perror("Error bind TCP");
-        exit(1);
-    }
-
-    return sock;
+    return configure_socket(port, SOCK_STREAM);
 }

@@ -8,9 +8,10 @@
 #include <string.h>
 #include "headers/alive.h"
 #include "headers/pdu.h"
-#include "headers/globals.h"
+#include "globals.h"
 #include "headers/conexions.h"
 #include "headers/socket.h"
+#include "headers/pdu.h"
 
 int pid_alive = 0;
 
@@ -48,15 +49,12 @@ int send_wait_ALIVE(int sock, int t) {
     PDU_UDP alive_pkt = generate_PDU_UDP(ALIVE, cfg.id, srv_info.comm_id, "");
 
     PDU_UDP rcv_pkt;
-    const struct sockaddr_in addr_srv = sockaddr_in_generator(cfg.address, cfg.server_UDP);
+    struct sockaddr_in addr_srv = sockaddr_in_generator(cfg.address, cfg.server_UDP);
 
     fd_set fileDesctiptors;
     struct timeval tv = {t, 0};
 
-    if (sendto(sock, &alive_pkt, sizeof(alive_pkt), 0,
-               (struct sockaddr *) &addr_srv, sizeof(addr_srv)) < 0) {
-        perror("Error send ALIVE");
-    } else if (debug) print_PDU_UDP(alive_pkt, "ENVIAT ALIVE");
+    send_pdu_UDP(sock, alive_pkt, addr_srv, "ALIVE");
 
     FD_SET(sock, &fileDesctiptors);
     select(sock + 1, &fileDesctiptors, NULL, NULL, &tv);

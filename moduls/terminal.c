@@ -7,7 +7,7 @@
 #include <string.h>
 
 #include "headers/config.h"
-#include "headers/globals.h"
+#include "globals.h"
 #include "headers/sendrecive.h"
 #include "headers/terminal.h"
 

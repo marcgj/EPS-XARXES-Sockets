@@ -10,8 +10,9 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
+
 #include "moduls/headers/config.h"
-#include "moduls/headers/globals.h"
+#include "moduls/globals.h"
 #include "moduls/headers/socket.h"
 #include "moduls/headers/register.h"
 #include "moduls/headers/alive.h"
@@ -23,7 +24,6 @@
 
 
 void handle_args(int argc, char *argv[], char *cfgFileName);
-
 void sigterm(int s);
 
 int main(int argc, char *argv[]) {

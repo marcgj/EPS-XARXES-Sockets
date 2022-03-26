@@ -12,7 +12,7 @@ add_executable(Client client.c
         moduls/register.c moduls/headers/register.h
         moduls/sendrecive.c moduls/headers/sendrecive.h
         moduls/socket.c moduls/headers/socket.h
-        moduls/headers/globals.h
+        moduls/globals.h
         )
 
 cmake_minimum_required(VERSION 3.21)

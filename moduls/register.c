@@ -11,7 +11,7 @@
 #include "headers/conexions.h"
 #include "headers/register.h"
 #include "headers/socket.h"
-#include "headers/globals.h"
+#include "globals.h"
 #include "headers/pdu.h"
 
 void register_client(int udpSock) {
@@ -32,22 +32,18 @@ void register_client(int udpSock) {
 int reg_procedure(int sock, struct sockaddr_in addr_server) {
     int const t = 1, u = 2, n = 8, p = 2, q = 4;
     int packets = 1;
+    status = NOT_REGISTERED;
 
     fd_set fileDesctiptors;
-    struct timeval tv;
+    struct timeval tv = {t, 0};
 
-    struct sockaddr_in addr_rcv;
-    struct sockaddr_in addr_server2 = addr_server;
-
+    // addr_server2 nomes canvia en el port i es fa anar quan es continua el registre per un segon port upd
+    struct sockaddr_in addr_rcv, addr_server2 = addr_server;
 
     PDU_UDP reg_req_pkt = generate_PDU_UDP(REG_REQ, cfg.id, ZERO_COMM_ID, "");
 
-    tv.tv_sec = t;
-    tv.tv_usec = 0;
-
     if (debug) printf("\nInici proces de registre\n");
     if (debug) printf("/////////////////////////////////////////////////////////////////////////////////////////\n");
-    status = NOT_REGISTERED;
     while (status != REGISTERED) {
         FD_ZERO(&fileDesctiptors);
         if (packets > p && tv.tv_sec < q * t) tv.tv_sec += t;
@@ -60,12 +56,8 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
             case NOT_REGISTERED:
                 if (debug) printf("Status -> NOT_REGISTERED\n");
 
-                if (sendto(sock, &reg_req_pkt, sizeof(reg_req_pkt), 0,
-                           (struct sockaddr *) &addr_server, sizeof(addr_server)) < 0) {
-                    perror("Error send REG_REQ1");
-                } else {
-                    if (debug) print_PDU_UDP(reg_req_pkt, "ENVIAT REG_REQ");
-                }
+                send_pdu_UDP(sock, reg_req_pkt, addr_server, "REG_REQ");
+
                 status = WAIT_ACK_REG;
                 break;
 
@@ -91,12 +83,8 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                             PDU_UDP reg_info_pkt = generate_PDU_UDP(REG_INFO, cfg.id, srv_info.comm_id, "");
                             sprintf(reg_info_pkt.data, "%i,%s", cfg.local_TCP, cfg.elements_string);
 
-                            if (sendto(sock, &reg_info_pkt, sizeof(reg_info_pkt), 0,
-                                       (struct sockaddr *) &addr_server2, sizeof(addr_server2)) < 0) {
-                                perror("Error send REG_INFO");
-                            } else {
-                                if (debug) print_PDU_UDP(reg_info_pkt, "ENVIAT REG_INFO");
-                            }
+                            send_pdu_UDP(sock, reg_info_pkt, addr_server2, "REG_INFO");
+
                             status = WAIT_ACK_INFO;
                             break;
 
@@ -114,26 +102,20 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                             return -1;
                     }
                 } else {
-                    if (sendto(sock, &reg_req_pkt, sizeof(reg_req_pkt), 0,
-                               (struct sockaddr *) &addr_server, sizeof(addr_server)) < 0) {
-                        perror("Error send REG_REQ1");
-                    } else {
-                        if (debug) print_PDU_UDP(reg_req_pkt, "ENVIAT REG_REQ2");
-                    }
+                    send_pdu_UDP(sock, reg_req_pkt, addr_server, "REG_REQ");
                     packets++;
                 }
                 break;
 
             case WAIT_ACK_INFO:
                 if (debug) printf("Status -> WAIT_ACK_INFO\n");
-                tv.tv_sec = 2 * t;
+                tv.tv_sec *= 2;
 
                 FD_SET(sock, &fileDesctiptors);
                 select(sock + 1, &fileDesctiptors, NULL, NULL, &tv);
                 if (FD_ISSET(sock, &fileDesctiptors)) {
                     PDU_UDP rcv_pkt;
-                    recvfrom(sock, &rcv_pkt, sizeof(rcv_pkt), 0, (struct sockaddr *) &addr_rcv,
-                             NULL);
+                    recvfrom(sock, &rcv_pkt, sizeof(rcv_pkt), 0, (struct sockaddr *) &addr_rcv, NULL);
 
                     if (!is_valid_pkg(&rcv_pkt, srv_info)) {
                         if (debug) print_PDU_UDP(rcv_pkt, "REBUT PAQUET ERRONI");
@@ -159,16 +141,14 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                             if (debug) print_PDU_UDP(rcv_pkt, "REBUT DESCONEGUT");
                             return -1;
                     }
-                } else {
-                    return -1;
                 }
-                break;
+                return -1;
 
             default:
+                //do nothing
                 break;
         }
-        if (debug)
-            printf("/////////////////////////////////////////////////////////////////////////////////////////\n");
+        if (debug) printf("/////////////////////////////////////////////////////////////////////////////////////////\n");
     }
     return 0;
 }

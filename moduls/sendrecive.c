@@ -11,11 +11,20 @@
 #include <stdio.h>
 
 #include "headers/conexions.h"
-
 #include "headers/sendrecive.h"
 #include "headers/socket.h"
 #include "headers/pdu.h"
-#include "headers/globals.h"
+#include "globals.h"
+
+int is_valid_element(PDU_TCP inpkt, PDU_TCP outpkg) {
+    if (strcmp(inpkt.element, outpkg.element) != 0) return 0;
+    return 1;
+}
+
+int id_in_info(PDU_TCP inpkt, char * id) {
+    if (strcmp(inpkt.element, id) != 0) return 0;
+    return 1;
+}
 
 void send_element(Element elem) {
     signal(SIGUSR1, sig_usr);
@@ -36,26 +45,20 @@ void send_element(Element elem) {
             if (debug) printf("Conexio establida amb el servidor via TCP\n");
         }
 
-        PDU_TCP send_data_pkg = generate_PDU_TCP_Elem(SEND_DATA, cfg.id, srv_info.comm_id, elem);
+        PDU_TCP rcv_pkt, send_data_pkg = generate_PDU_TCP_Elem(SEND_DATA, cfg.id, srv_info.comm_id, elem);
 
-        if (send(sock, &send_data_pkg, sizeof(send_data_pkg), 0) < 0) {
-            perror("Error SEND_DATA");
-            exit(1);
-        } else {
-            if (debug) print_PDU_TCP(send_data_pkg, "ENVIAT SEND_DATA");
-        }
+        send_pdu_TCP(sock, send_data_pkg, "SEND_DATA");
 
         fd_set fDesc;
         FD_ZERO(&fDesc);
         struct timeval tv = {m, 0};
-        PDU_TCP rcv_pkt;
 
         FD_SET(sock, &fDesc);
         select(sock + 1, &fDesc, NULL, NULL, &tv);
         if (FD_ISSET(sock, &fDesc)) {
             recv(sock, &rcv_pkt, sizeof(rcv_pkt), 0);
             if (!is_valid_pkg(&rcv_pkt, srv_info) ||
-                strcmp(rcv_pkt.element, send_data_pkg.element) != 0) {
+                !is_valid_element(rcv_pkt, send_data_pkg)) {
                 if (debug) print_PDU_TCP(rcv_pkt, "REBUT PAQUET ERRONI");
                 if (debug) printf("ERROR: DATA_ACK REBUT CAMP ELEMENT ERRONI\n");
                 kill(parent_pid, SIGUSR1);
@@ -103,7 +106,7 @@ void handle_incoming_connection(int sock) {
     if (FD_ISSET(sock2, &fDesc)) {
         recv(sock2, &rcv_pkt, sizeof(rcv_pkt), 0);
         if (!is_valid_pkg(&rcv_pkt, srv_info) ||
-            strcmp(rcv_pkt.info, cfg.id) != 0) {
+            !id_in_info(rcv_pkt, cfg.id)) {
             //TODO preguntar quin es el comportament del test 18
 
             if (debug) print_PDU_TCP(rcv_pkt, "REBUT PAQUET ERRONI");
@@ -113,14 +116,9 @@ void handle_incoming_connection(int sock) {
                     generate_PDU_TCP(DATA_REJ, cfg.id, srv_info.comm_id, rcv_pkt.element,
                                      rcv_pkt.value, "Error paquet amb dades erronies");
 
-            if (send(sock2, &data_rej_pkt, sizeof(data_rej_pkt), 0) < 0) {
-                perror("Error DATA_REJ");
-                exit(1);
-            } else {
-                if (debug) print_PDU_TCP(data_rej_pkt, "ENVIAT DATA_REJ");
-                status = NOT_REGISTERED;
-                return;
-            }
+            send_pdu_TCP(sock2, data_rej_pkt, "DATA_REJ");
+            status = NOT_REGISTERED;
+            return;
         }
 
         PDU_TCP data_nack_pkt = generate_PDU_TCP(DATA_NACK, cfg.id, srv_info.comm_id, rcv_pkt.element,
@@ -136,12 +134,7 @@ void handle_incoming_connection(int sock) {
                     if (rcv_pkt.element[6] == 'I') {
                         strcpy(elem->value, rcv_pkt.value);
                         PDU_TCP data_ack = generate_PDU_TCP_Elem(DATA_ACK, cfg.id, srv_info.comm_id, *elem);
-                        if (send(sock2, &data_ack, sizeof(data_ack), 0) < 0) {
-                            perror("Error DATA_ACK");
-                            exit(1);
-                        } else {
-                            if (debug) print_PDU_TCP(data_ack, "ENVIAT DATA_ACK");
-                        }
+                        send_pdu_TCP(sock2, data_ack, "DATA_ACK");
                         return;
                     }
                     strcpy(data_nack_pkt.info, "Error nomes es pot fer set a elements tipus I");
@@ -152,12 +145,7 @@ void handle_incoming_connection(int sock) {
 
                     if (rcv_pkt.element[6] == 'O') {
                         PDU_TCP data_ack = generate_PDU_TCP_Elem(DATA_ACK, cfg.id, srv_info.comm_id, *elem);
-                        if (send(sock2, &data_ack, sizeof(data_ack), 0) < 0) {
-                            perror("Error DATA_ACK");
-                            exit(1);
-                        } else {
-                            if (debug) print_PDU_TCP(data_ack, "ENVIAT DATA_ACK");
-                        }
+                        send_pdu_TCP(sock2, data_ack, "DATA_ACK");
                         return;
                     }
                     strcpy(data_nack_pkt.info, "Error nomes es pot fer get a elements tipus O");
@@ -165,14 +153,8 @@ void handle_incoming_connection(int sock) {
             }
         }
 
-        if (send(sock2, &data_nack_pkt, sizeof(data_nack_pkt), 0) < 0) {
-            perror("Error DATA_NACK");
-            exit(1);
-        } else {
-            if (debug) print_PDU_TCP(data_nack_pkt, "ENVIAT DATA_NACK");
-            return;
-        }
-
+        send_pdu_TCP(sock2, data_nack_pkt, "DATA_ACK");
+        return;
     } else {
         fprintf(stderr, "No s'ha rebut cap paquet\n");
     }
