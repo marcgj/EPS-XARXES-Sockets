@@ -6,8 +6,8 @@
 #ifndef XARXES_PRACTICA1_GLOBALS_H
 #define XARXES_PRACTICA1_GLOBALS_H
 
-#include "headers/config.h"
-#include "headers/conexions.h"
+#include "config.h"
+#include "conexions.h"
 
 // TODO preguntar per les macros que no es fan anar
 
@@ -41,12 +41,12 @@
 
 #define ZERO_COMM_ID "0000000000"
 
-int debug;
-unsigned char status;
-ClientCfg cfg;
-ConnexionInfo srv_info;
-int udpSocket;
-int tcpSock;
-int end;
+extern int debug;
+extern unsigned char status;
+extern ClientCfg cfg;
+extern ConnexionInfo srv_info;
+extern int udpSocket;
+extern int tcpSock;
+extern int end;
 
 #endif //XARXES_PRACTICA1_GLOBALS_H

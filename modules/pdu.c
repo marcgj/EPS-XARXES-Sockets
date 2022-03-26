@@ -3,23 +3,24 @@
 //
 
 #include <time.h>
-#include <printf.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#include "globals.h"
+#include "headers/globals.h"
 #include "headers/pdu.h"
+#include "headers/terminal.h"
 
 void print_PDU_UDP(PDU_UDP pdu, char *pretext) {
-    printf("%s // \t TYPE= %i \t TX_ID= %s\t COMM_ID= %s\t DATA= %s\n", pretext, pdu.type, pdu.tx_id, pdu.comm_id,
-           pdu.data);
+    print_debug("%s // \t TYPE= %i \t TX_ID= %s\t COMM_ID= %s\t DATA= %s\n", pretext, pdu.type, pdu.tx_id, pdu.comm_id,
+          pdu.data);
 }
 
 void print_PDU_TCP(PDU_TCP pdu, char *pretext) {
-    printf("%s // \t TYPE= %i \t TX_ID= %s\t COMM_ID= %s\t ELEM= %s\t VALUE= %s\t DATA= %s\n",
-           pretext, pdu.type, pdu.tx_id, pdu.comm_id, pdu.element, pdu.value, pdu.info);
+    print_debug("%s // \t TYPE= %i \t TX_ID= %s\t COMM_ID= %s\t ELEM= %s\t VALUE= %s\t DATA= %s\n",
+          pretext, pdu.type, pdu.tx_id, pdu.comm_id, pdu.element, pdu.value, pdu.info);
 }
 
 void print_pdu(void *pdu, int stype, char *pretext){
@@ -52,6 +53,7 @@ void send_pdu_UDP(int sock, PDU_UDP pdu, struct sockaddr_in addr, char *label){
         perror("");
         exit(1);
     }
+
     if (debug) print_pdu(&pdu, UDP, label);
 }
 

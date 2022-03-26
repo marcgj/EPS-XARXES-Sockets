@@ -2,14 +2,16 @@
 // Created by fedora on 23/3/22.
 //
 
+#include <printf.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "headers/config.h"
-#include "globals.h"
+#include "headers/globals.h"
 #include "headers/sendrecive.h"
 #include "headers/terminal.h"
+
 
 void handle_terminal() {
     char buffer[128];
@@ -67,4 +69,44 @@ void handle_terminal() {
         fprintf(stderr, "La comanda %s no es acceptada\n", token);
     }
 
+}
+
+void print(FILE * fd, char *tag, char * format, va_list args, ...){
+    if(args == NULL){
+        va_start(args, args);
+    }
+    char buffer[264] = "";
+
+    strcpy(buffer, tag);
+    strcat(buffer, " >> ");
+
+    strcat(buffer, format);
+    vfprintf(fd, buffer, args);
+}
+
+
+//https://www.cplusplus.com/reference/cstdio/vprintf/
+void print_error(char *format, ...) {
+    va_list args;
+    va_start(args, format);
+
+    print(stderr, "ERROR", format, args);
+}
+
+
+void print_debug(char *format, ...) {
+    if(!debug) return;
+
+    va_list args;
+    va_start(args, format);
+
+    print(stdout, "DEBUG", format, args);
+
+}
+
+void print_message(char *format, ...) {
+    va_list args;
+    va_start(args, format);
+
+    print(stdout, "MESSAGE", format, args);
 }

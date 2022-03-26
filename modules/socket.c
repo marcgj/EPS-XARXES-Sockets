@@ -5,8 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "globals.h"
+#include "headers/globals.h"
 #include "headers/socket.h"
+#include "headers/terminal.h"
 
 struct sockaddr_in sockaddr_in_generator(char *address, int port) {
     struct sockaddr_in result;
@@ -31,7 +32,8 @@ int configure_socket(int port, int type){
     int sock = socket(AF_INET, type, 0);
 
     if (sock < 0) {
-        perror("Error creant el socket");
+        print_error("Error creant el socket");
+        perror("");
         exit(1);
     }
 
@@ -42,21 +44,19 @@ int configure_socket(int port, int type){
     addr.sin_port = htons(port);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-        perror("Error bind UDP");
+        print_error("Error bind UDP");
+        perror("");
         kill(0, SIGTERM);
     }
-
     return sock;
 }
 
 int configure_udp(int port) {
-    if (debug) printf("\nObrint socket UDP amb port %i\n", port);
-
+    print_message("Obrint socket UDP amb port %i\n", port);
     return configure_socket(port, SOCK_DGRAM);
 }
 
 int configure_tcp(int port) {
-    if (debug) printf("\nObrint socket TCP amb port %i\n", port);
-
+    print_message("Obrint socket TCP amb port %i\n", port);
     return configure_socket(port, SOCK_STREAM);
 }

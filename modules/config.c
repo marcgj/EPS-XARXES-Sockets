@@ -7,11 +7,13 @@
 #include <string.h>
 
 #include "headers/config.h"
+#include "headers/terminal.h"
+#include "headers/globals.h"
 
 void load_config(char *filename, ClientCfg *clientConfig) {
     FILE *f = fopen(filename, "r");
     if (f == NULL) {
-        fprintf(stderr, "Error obrint arxiu %s: ", filename);
+        print_error("Error obrint arxiu %s: ", filename);
         perror("");
         exit(1);
     }
@@ -25,8 +27,6 @@ void load_config(char *filename, ClientCfg *clientConfig) {
         fscanf(f, "%d-", &elem->ordinal);
         fscanf(f, "%c", &elem->type);
         strcpy(clientConfig->elements[i].value, "NONE");
-
-
         sprintf(elem->elem_string, "%s-%d-%c", elem->magnitude, elem->ordinal, elem->type);
 
         char c;
@@ -43,18 +43,18 @@ void load_config(char *filename, ClientCfg *clientConfig) {
 
     elements_to_string(clientConfig->elements_string, clientConfig->elemc, clientConfig->elements);
 
-    printf("CONFIGURACIO CARGADA\n");
+    print_message("Configuracio carregada del archiu %s\n", filename);
     fclose(f);
 }
 
 void print_config(ClientCfg *cfg) {
-    printf("---------- DADES DISPOSITIU ----------\n");
-    printf(" Id: %s \n", cfg->id);
-    printf(" Address: %s \n", cfg->address);
-    printf(" TCP: %i\n", cfg->local_TCP);
-    printf(" UDP: %d \n\n", cfg->server_UDP);
+    print_debug("---------- DADES DISPOSITIU ----------\n");
+    print_debug(" Id: %s \n", cfg->id);
+    print_debug(" Address: %s \n", cfg->address);
+    print_debug(" TCP: %i\n", cfg->local_TCP);
+    print_debug(" UDP: %d \n\n", cfg->server_UDP);
     print_elements(cfg->elemc, cfg->elements);
-    printf("-----------------------------------");
+    print_debug("-----------------------------------\n");
 
 }
 
@@ -80,11 +80,15 @@ Element *getElement(ClientCfg *c, char *str) {
 }
 
 void print_elements(int elemc, Element elements[elemc]) {
-    printf("   Parametres \t Valors\n");
-    printf("   ----------- \t ------------------\n");
+    char tag[16] = "MESSAGE";
+    if (debug) strcpy(tag, "DEBUG");
+
+    print(stdout, tag, "   Parametres \t Valors\n", NULL);
+    print(stdout, tag, "   ----------- \t ------------------\n", NULL);
     for (int i = 0; i < elemc; ++i) {
         Element elem = elements[i];
-        printf("   %s \t\t %s\n", elem.elem_string, elem.value);
+
+        print(stdout, tag, "   %s \t\t %s\n", NULL, elem.elem_string, elem.value);
     }
 }
 

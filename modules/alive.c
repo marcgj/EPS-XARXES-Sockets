@@ -8,10 +8,10 @@
 #include <string.h>
 #include "headers/alive.h"
 #include "headers/pdu.h"
-#include "globals.h"
+#include "headers/globals.h"
 #include "headers/conexions.h"
 #include "headers/socket.h"
-#include "headers/pdu.h"
+#include "headers/terminal.h"
 
 int pid_alive = 0;
 
@@ -23,6 +23,7 @@ void start_alive_service(int sock, int t) {
     int parent_pid = getpid();
     int pid = fork();
     if (pid == 0) {
+        print_debug("Iniciat servei ALIVES\n");
         const int s = 3;
         int missing_alives = 0;
 
@@ -36,10 +37,12 @@ void start_alive_service(int sock, int t) {
             }
         }
 
+        print_error("No s'han rebut %i ALIVES consecutius tancant servei\n", s);
         kill(parent_pid, SIGUSR1);
         exit(1);
     } else if (pid < 0) {
-        perror("Error creant process alives");
+        print_error("Error creant process alives");
+        perror("");
         exit(1);
     }
     pid_alive = pid;
@@ -69,15 +72,15 @@ int send_wait_ALIVE(int sock, int t) {
             case ALIVE:
                 if (debug) print_PDU_UDP(rcv_pkt, "REBUT ALIVE");
                 if (strcmp(rcv_pkt.data, cfg.id) != 0) {
-                    if (debug) printf("ERROR: ALIVE REBUT NO CONTE LA ID\n");
+                    print_error("El ALIVE rebut no conte la id esperada al camp dades\n");
                     return -2;
                 } else return 0;
 
             case ALIVE_REJ:
-                if (debug) print_PDU_UDP(rcv_pkt, "REBUT ALIVE_REJ");
+                print_PDU_UDP(rcv_pkt, "REBUT ALIVE_REJ");
                 return -2;
         }
     }
-    if (debug) fprintf(stderr, "NO s'ha rebut l'ALIVE\n");
+    print_error("NO s'ha rebut resposta a l'ALIVE en %is\n", t);
     return -1;
 }

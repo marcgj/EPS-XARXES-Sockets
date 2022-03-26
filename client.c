@@ -2,17 +2,17 @@
 // Created by Marc Gaspà Joval on 2/3/22.
 //
 
+#include <sys/socket.h>
+#include <printf.h>
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <time.h>
 #include <string.h>
-#include <arpa/inet.h>
 #include <sys/wait.h>
 
 #include "modules/headers/config.h"
-#include "modules/globals.h"
+#include "modules/headers/globals.h"
 #include "modules/headers/socket.h"
 #include "modules/headers/register.h"
 #include "modules/headers/alive.h"
@@ -22,8 +22,8 @@
 
 #define DEFAULT_CFG "../client.cfg"
 
-
 void handle_args(int argc, char *argv[], char *cfgFileName);
+
 void sigterm(int s);
 
 int main(int argc, char *argv[]) {
@@ -49,10 +49,12 @@ int main(int argc, char *argv[]) {
                 if (send_wait_ALIVE(udpSocket, v * r) == 0) {
                     start_alive_service(udpSocket, v);
                     status = SEND_ALIVE;
+                    print_debug("Estat actual= SEND_ALIVE\n");
 
                     tcpSock = configure_tcp(cfg.local_TCP);
                     if (listen(tcpSock, 16) < 0) {
-                        perror("Error listen");
+                        print_error("Error al fer listen al port TCP");
+                        perror("");
                         status = NOT_REGISTERED;
                     }
                 } else status = NOT_REGISTERED;
@@ -81,13 +83,13 @@ void handle_args(int argc, char **argv, char *cfgFileName) {
     if (argc > 1) {
         for (int i = 1; i < argc;) {
             if (argv[i][0] != '-' || strlen(argv[i]) > 2) {
-                perror("Mal us dels arguments");
+                print_error("Mal us dels arguments");
                 kill(0, SIGTERM);
             }
             switch (argv[i][1]) {
                 case 'd':
                     debug = 1;
-                    printf("MODE DEBUG ACTIVAT\n");
+                    print_debug("MODE DEBUG ACTIVAT\n");
                     i++;
                     break;
                 case 'c':
@@ -96,11 +98,10 @@ void handle_args(int argc, char **argv, char *cfgFileName) {
                     break;
 
                 default:
-                    printf("Parametre no reconegut");
+                    print_error("Parametre no reconegut");
                     kill(0, SIGTERM);
             }
         }
-        if (debug) printf("Config File Selected: %s\n", cfgFileName);
     }
 
 }
@@ -108,13 +109,10 @@ void handle_args(int argc, char **argv, char *cfgFileName) {
 void sigterm(int s) {
     if (s == SIGTERM) {
         kill(0, SIGUSR1);
-        while (wait(NULL) != -1) printf("Fill tancat\n");
+        int pid;
+        while ((pid = wait(NULL)) != -1) print_debug("Fill amb pid=%i tancat\n", pid);
         exit(0);
     }
 }
-
-
-
-
 
 
