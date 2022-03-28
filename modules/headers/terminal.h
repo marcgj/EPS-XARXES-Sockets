@@ -5,8 +5,9 @@
 #ifndef XARXES_PRACTICA1_TERMINAL_H
 #define XARXES_PRACTICA1_TERMINAL_H
 
+void vaList_generator(va_list *outList, ...);
 
-void print(FILE *fd, char *tag, char *format, va_list args, ...);
+void print(FILE *fd, char *tag, char *format, va_list args);
 
 void print_error(char *format, ...);
 

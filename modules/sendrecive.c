@@ -23,7 +23,7 @@ int is_valid_element(PDU_TCP inpkt, PDU_TCP outpkg) {
 }
 
 int id_in_info(PDU_TCP inpkt, char *id) {
-    if (strcmp(inpkt.element, id) != 0) return 0;
+    if (strcmp(inpkt.info, id) != 0) return 0;
     return 1;
 }
 
@@ -148,13 +148,8 @@ void handle_incoming_connection(int sock) {
 
                 case GET_DATA:
                     print_PDU_TCP(rcv_pkt, "REBUT GET_DATA");
-
-                    if (rcv_pkt.element[6] == 'O') {
-                        PDU_TCP data_ack = generate_PDU_TCP_Elem(DATA_ACK, cfg.id, srv_info.comm_id, *elem);
-                        send_pdu_TCP(sock2, data_ack, "DATA_ACK");
-                        return;
-                    }
-                    strcpy(data_nack_pkt.info, "Error nomes es pot fer get a elements tipus O");
+                    PDU_TCP data_ack = generate_PDU_TCP_Elem(DATA_ACK, cfg.id, srv_info.comm_id, *elem);
+                    send_pdu_TCP(sock2, data_ack, "DATA_ACK");
                     break;
             }
         }

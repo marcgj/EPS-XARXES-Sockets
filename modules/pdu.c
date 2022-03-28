@@ -14,12 +14,12 @@
 #include "headers/terminal.h"
 
 void print_PDU_UDP(PDU_UDP pdu, char *pretext) {
-    print_debug("%s // \t TYPE= %i \t TX_ID= %s\t COMM_ID= %s\t DATA= %s\n", pretext, pdu.type, pdu.tx_id, pdu.comm_id,
+    print_debug("%s // \t TYPE=%i \t TX_ID=%s\t COMM_ID=%s\t DATA=%s\n", pretext, pdu.type, pdu.tx_id, pdu.comm_id,
                 pdu.data);
 }
 
 void print_PDU_TCP(PDU_TCP pdu, char *pretext) {
-    print_debug("%s // \t TYPE= %i \t TX_ID= %s\t COMM_ID= %s\t ELEM= %s\t VALUE= %s\t DATA= %s\n",
+    print_debug("%s // \t TYPE=%i \t TX_ID=%s\t COMM_ID=%s\t ELEM=%s\t VALUE=%s\t DATA=%s\n",
                 pretext, pdu.type, pdu.tx_id, pdu.comm_id, pdu.element, pdu.value, pdu.info);
 }
 

@@ -57,7 +57,7 @@ int send_wait_ALIVE(int sock, int t) {
     fd_set fileDesctiptors;
     struct timeval tv = {t, 0};
 
-    send_pdu_UDP(sock, alive_pkt, addr_srv, "ALIVE");
+    send_pdu_UDP(sock, alive_pkt, addr_srv, " ENVIAT ALIVE");
 
     FD_SET(sock, &fileDesctiptors);
     select(sock + 1, &fileDesctiptors, NULL, NULL, &tv);

@@ -20,7 +20,7 @@ void register_client(int udpSock) {
     int procedures = 1;
     struct sockaddr_in addr_server = sockaddr_in_generator(cfg.address, cfg.server_UDP);
 
-    while (procedures < o) {
+    while (procedures <= o) {
         print_message("Iniciant proces de registre (%i)\n", procedures);
         if (reg_procedure(udpSock, addr_server) == 1) {
             return;

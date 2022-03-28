@@ -19,8 +19,13 @@
 #include "modules/headers/terminal.h"
 #include "modules/headers/sendrecive.h"
 
-
 #define DEFAULT_CFG "../client.cfg"
+
+// TODO preguntar que pasa amb el t3, i si s-ha denviar algo
+
+// get GHXE2LWQ6C LUM-0-O
+// set GHXE2LWQ6C LUM-0-I test
+// set LUM-0-O test
 
 void handle_args(int argc, char *argv[], char *cfgFileName);
 

@@ -10,6 +10,8 @@
 #include "headers/terminal.h"
 #include "headers/globals.h"
 
+
+
 void load_config(char *filename, ClientCfg *clientConfig) {
     FILE *f = fopen(filename, "r");
     if (f == NULL) {
@@ -83,12 +85,11 @@ void print_elements(int elemc, Element elements[elemc]) {
     char tag[16] = "MESSAGE";
     if (debug) strcpy(tag, "DEBUG");
 
-    print(stdout, tag, "   Parametres \t Valors\n", NULL);
-    print(stdout, tag, "   ----------- \t ------------------\n", NULL);
+    printf("%s    Parametres \t Valors\n", tag);
+    printf("%s    ----------- \t ------------------\n", tag);
     for (int i = 0; i < elemc; ++i) {
         Element elem = elements[i];
-
-        print(stdout, tag, "   %s \t\t %s\n", NULL, elem.elem_string, elem.value);
+        printf("%s   %s \t\t %s\n", tag, elem.elem_string, elem.value);
     }
 }
 

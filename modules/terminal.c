@@ -71,10 +71,11 @@ void handle_terminal() {
 
 }
 
-void print(FILE *fd, char *tag, char *format, va_list args, ...) {
-    if (args == NULL) {
-        va_start(args, args);
-    }
+void vaList_generator(va_list *outList, ...) {
+    va_start(*outList, outList);
+}
+
+void print(FILE *fd, char *tag, char *format, va_list args) {
     char buffer[264] = "";
 
     strcpy(buffer, tag);
