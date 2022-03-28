@@ -25,7 +25,13 @@ int is_valid_pkg(void *pkg, ConnexionInfo info) {
     return 1;
 }
 
+// TODO preguntar si comprovar les adreces aixi pot suposar algun problema
+int is_same_addr(struct sockaddr_in addr1, struct sockaddr_in addr2) {
+    if (addr1.sin_addr.s_addr == addr2.sin_addr.s_addr) return 1;
+    return 0;
+}
 
-//TODO comprovar a tot arreu on faci falta que la ip del servidor tmb es la correcta
+
+
 
 

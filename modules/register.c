@@ -73,8 +73,8 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                     switch (rcv_pkt.type) {
                         case REG_ACK:
                             print_PDU_UDP(rcv_pkt, "REBUT REQ_ACK");
-
                             srv_info.udp_port = (int) strtol(rcv_pkt.data, NULL, 10);
+                            srv_info.addr = addr_rcv;
                             strcpy(srv_info.comm_id, rcv_pkt.comm_id);
                             strcpy(srv_info.tx_id, rcv_pkt.tx_id);
 
@@ -117,7 +117,7 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                     PDU_UDP rcv_pkt;
                     recvfrom(sock, &rcv_pkt, sizeof(rcv_pkt), 0, (struct sockaddr *) &addr_rcv, NULL);
 
-                    if (!is_valid_pkg(&rcv_pkt, srv_info)) {
+                    if (!is_valid_pkg(&rcv_pkt, srv_info) || !is_same_addr(srv_info.addr, addr_rcv)) {
                         print_PDU_UDP(rcv_pkt, "REBUT PAQUET ERRONI");
                         return -1;
                     }
@@ -126,7 +126,6 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                         case INFO_ACK:
                             print_PDU_UDP(rcv_pkt, "REBUT INFO_ACK");
                             srv_info.tcp_port = (int) strtol(rcv_pkt.data, NULL, 10);
-
                             print_message("Registre completat amb exit");
 
                             status = REGISTERED;

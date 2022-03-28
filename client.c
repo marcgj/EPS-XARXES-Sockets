@@ -61,6 +61,7 @@ int main(int argc, char *argv[]) {
                         print_error("Error al fer listen al port TCP");
                         perror("");
                         status = NOT_REGISTERED;
+
                     }
                 } else status = NOT_REGISTERED;
                 break;

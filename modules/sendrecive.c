@@ -44,9 +44,8 @@ void send_element(Element elem) {
             print_error("Ha fallat el connect del enviament de dades");
             perror("");
             exit(1);
-        } else {
-            print_message("Conexio establida amb el servidor via TCP\n");
         }
+        print_message("Conexio establida amb el servidor via TCP\n");
 
         PDU_TCP rcv_pkt, send_data_pkg = generate_PDU_TCP_Elem(SEND_DATA, cfg.id, srv_info.comm_id, elem);
 
@@ -154,7 +153,7 @@ void handle_incoming_connection(int sock) {
             }
         }
 
-        send_pdu_TCP(sock2, data_nack_pkt, "DATA_ACK");
+        send_pdu_TCP(sock2, data_nack_pkt, "DATA_NACK");
         return;
     } else {
         perror("No s'ha rebut cap paquet\n");
