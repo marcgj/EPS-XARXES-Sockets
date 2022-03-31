@@ -26,13 +26,14 @@ void load_config(char *filename, ClientCfg *clientConfig) {
     for (int i = 0, eol = 0; i < 5 && !eol; i++) {
         Element *elem = &clientConfig->elements[i];
         fscanf(f, "%3s-", elem->magnitude);
-        fscanf(f, "%d-", &elem->ordinal);
-        fscanf(f, "%c", &elem->type);
+        fscanf(f, "%1i-", &elem->ordinal);
+        fscanf(f, "%1c", &elem->type);
         strcpy(clientConfig->elements[i].value, "NONE");
         sprintf(elem->elem_string, "%s-%d-%c", elem->magnitude, elem->ordinal, elem->type);
 
         char c;
         fscanf(f, "%c", &c);
+
         if (c != ';') {
             eol = 1;
             clientConfig->elemc = i + 1;
