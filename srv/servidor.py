@@ -9,8 +9,9 @@ from srv.modules.register import RegisterService
 cfg_filename = "server.cfg"
 authorized_filename = "bbdd_dev.dat"
 
+
 # Elimina un error de keyboard interrupt al fer cntrl+c
-def siging_handler(signal, frame):
+def siging_handler(s, f):
     exit(0)
 
 

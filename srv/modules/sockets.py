@@ -6,23 +6,18 @@ from struct import pack, unpack
 class UDP_PDU:
     format = "B11s11s61s"
 
-    def __init__(self):
-        self.buffer = None
-        self.type = ""
-        self.txId = ""
-        self.commId = ""
-        self.data = ""
-
-    def load_buffer(self, buffer):
-        self.buffer = buffer
-        self._unpack()
-
-    def load_values(self, type, txId, commId, data):
+    def __init__(self, type=None, txId="", commId="", data=""):
+        self.buffer = b""
         self.type = type
         self.txId = str(txId)
         self.commId = str(commId)
         self.data = str(data)
-        self._pack()
+        if type:
+            self._pack()
+
+    def load_buffer(self, buffer):
+        self.buffer = buffer
+        self._unpack()
 
     def _pack(self):
         self.buffer = pack(self.format, self.type, self.txId.encode("utf-8"),
@@ -35,7 +30,7 @@ class UDP_PDU:
         self.txId = self.txId.split('\0')[0]
         self.commId = commId.decode("utf-8")
         self.commId = self.commId.split('\0')[0]
-        self.data = data.decode("utf-8", errors='ignore')
+        self.data = data.decode("utf-8", errors="ignore")
         self.data = self.data.split('\0')[0]
 
     def __str__(self):
@@ -56,7 +51,7 @@ def _config_socket(socktype, port):
 
 def config_UDP(port):
     s = _config_socket(socket.SOCK_DGRAM, port)
-    print_msg(f"Obert socket UDP amb port {port}")
+    print_msg(f"Obert socket UDP amb port {s.getsockname()[1]}")
     return s
 
 

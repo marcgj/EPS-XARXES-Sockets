@@ -1,5 +1,6 @@
 from srv.modules.terminal import print_msg, print_err
 from srv.modules.constants import Status
+from srv.modules.terminal import print_dbg
 
 # Parametres per defecte
 
@@ -8,12 +9,17 @@ class Device:
     def __init__(self, deviceid: str):
         self.id = deviceid
         self.status = Status.DISCONNECTED
+        self.lastAlive = None
+        self.missedAlives = 0
         self.ip = None
         self.portUDP = None
         self.portTCP = None
         self.commId = ""
-
         self.elements = {}
+
+    def change_status(self, newStatus):
+        self.status = newStatus
+        print_dbg(f"Status del dispositiu {self.id} es {self.status.name}")
 
 
 class ServerCfg:
