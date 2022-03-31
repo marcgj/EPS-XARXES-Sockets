@@ -53,6 +53,7 @@ int send_wait_ALIVE(int sock, int t) {
 
     PDU_UDP rcv_pkt;
     struct sockaddr_in addr_rcv, addr_srv = sockaddr_in_generator(cfg.address, cfg.server_UDP);
+    socklen_t a_len = sizeof(addr_rcv);
 
     fd_set fileDesctiptors;
     struct timeval tv = {t, 0};
@@ -62,7 +63,7 @@ int send_wait_ALIVE(int sock, int t) {
     FD_SET(sock, &fileDesctiptors);
     select(sock + 1, &fileDesctiptors, NULL, NULL, &tv);
     if (FD_ISSET(sock, &fileDesctiptors)) {
-        recvfrom(sock, &rcv_pkt, sizeof(rcv_pkt), 0, (struct sockaddr *) &addr_rcv, NULL);
+        recvfrom(sock, &rcv_pkt, sizeof(rcv_pkt), 0, (struct sockaddr *) &addr_rcv, &a_len);
         if (!is_valid_pkg(&rcv_pkt, srv_info) || !is_same_addr(srv_info.addr, addr_rcv)) {
             print_PDU_UDP(rcv_pkt, "REBUT PAQUET ERRONI");
             return -2;

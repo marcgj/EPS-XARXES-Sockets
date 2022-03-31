@@ -41,6 +41,8 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
 
     // addr_server2 nomes canvia en el port i es fa anar quan es continua el registre per un segon port upd
     struct sockaddr_in addr_rcv, addr_server2 = addr_server;
+    socklen_t a_len = sizeof(addr_rcv);
+
 
     PDU_UDP reg_req_pkt = generate_PDU_UDP(REG_REQ, cfg.id, ZERO_COMM_ID, "");
 
@@ -68,7 +70,7 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                 select(sock + 1, &fileDesctiptors, NULL, NULL, &tv);
                 if (FD_ISSET(sock, &fileDesctiptors)) {
                     PDU_UDP rcv_pkt;
-                    recvfrom(sock, &rcv_pkt, sizeof(rcv_pkt), 0, (struct sockaddr *) &addr_rcv, NULL);
+                    recvfrom(sock, &rcv_pkt, sizeof(rcv_pkt), 0, (struct sockaddr *) &addr_rcv, &a_len);
 
                     switch (rcv_pkt.type) {
                         case REG_ACK:
