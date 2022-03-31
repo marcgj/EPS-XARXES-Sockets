@@ -54,8 +54,9 @@ void print_config(ClientCfg *cfg) {
     print_debug(" Id: %s \n", cfg->id);
     print_debug(" Address: %s \n", cfg->address);
     print_debug(" TCP: %i\n", cfg->local_TCP);
-    print_debug(" UDP: %d \n\n", cfg->server_UDP);
-    print_elements(cfg->elemc, cfg->elements);
+    print_debug(" UDP: %d \n", cfg->server_UDP);
+    print_debug("\n");
+    print_elements(cfg->elemc, debug, cfg->elements);
     print_debug("-----------------------------------\n");
 
 }
@@ -81,15 +82,15 @@ Element *getElement(ClientCfg *c, char *str) {
     return NULL;
 }
 
-void print_elements(int elemc, Element elements[elemc]) {
-    char tag[16] = "MESSAGE";
-    if (debug) strcpy(tag, "DEBUG");
+void print_elements(int elemc, int dbg,  Element elements[elemc]) {
+    char tag[16] = "MESSAGE >>";
+    if (dbg) strcpy(tag, "DEBUG >>");
 
     printf("%s    Parametres \t Valors\n", tag);
     printf("%s    ----------- \t ------------------\n", tag);
     for (int i = 0; i < elemc; ++i) {
         Element elem = elements[i];
-        printf("%s   %s \t\t %s\n", tag, elem.elem_string, elem.value);
+        printf("%s    %s \t\t %s\n", tag, elem.elem_string, elem.value);
     }
 }
 

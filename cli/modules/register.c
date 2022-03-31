@@ -126,7 +126,7 @@ int reg_procedure(int sock, struct sockaddr_in addr_server) {
                         case INFO_ACK:
                             print_PDU_UDP(rcv_pkt, "REBUT INFO_ACK");
                             srv_info.tcp_port = (int) strtol(rcv_pkt.data, NULL, 10);
-                            print_message("Registre completat amb exit");
+                            print_message("Registre completat amb exit\n");
 
                             status = REGISTERED;
                             return 1;

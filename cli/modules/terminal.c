@@ -28,7 +28,7 @@ void handle_terminal() {
         printf("---------------------------------------\n");
         printf("Id= %s\n", cfg.id);
         printf("Status= %i\n\n", status);
-        print_elements(cfg.elemc, cfg.elements);
+        print_elements(cfg.elemc, 0, cfg.elements);
         printf("---------------------------------------\n");
     } else if (strcmp(token, "set") == 0) {
         token = strtok(NULL, " ");

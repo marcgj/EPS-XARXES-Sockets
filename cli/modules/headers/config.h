@@ -35,6 +35,6 @@ Element *getElement(ClientCfg *c, char *str);
 
 void elements_to_string(char *str, int elemc, Element elems[elemc]);
 
-void print_elements(int elemc, Element elements[elemc]);
+void print_elements(int elemc, int dbg, Element elements[elemc]);
 
 #endif //SO_PRACTICA1_CFGLOADER_H

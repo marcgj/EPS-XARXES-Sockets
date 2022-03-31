@@ -19,7 +19,7 @@
 #include "modules/headers/terminal.h"
 #include "modules/headers/sendrecive.h"
 
-#define DEFAULT_CFG "../client.cfg"
+#define DEFAULT_CFG "client.cfg"
 
 // TODO preguntar que pasa amb el t3, i si s-ha denviar algo
 
