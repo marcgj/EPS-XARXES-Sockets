@@ -1,18 +1,19 @@
 import socket
-from srv.modules.terminal import print_msg, print_err
+from srv.modules.terminal import print_msg, print_err, print_dbg
+from srv.modules.constants import enum_from_value, Types
 from struct import pack, unpack
 
 
 class UDP_PDU:
     format = "B11s11s61s"
 
-    def __init__(self, type=None, txId="", commId="", data=""):
+    def __init__(self, _type: Types = None, txId="", commId="", data=""):
         self.buffer = b""
-        self.type = type
+        self.type = _type
         self.txId = str(txId)
         self.commId = str(commId)
         self.data = str(data)
-        if type:
+        if _type:
             self._pack()
 
     def load_buffer(self, buffer):
@@ -20,12 +21,12 @@ class UDP_PDU:
         self._unpack()
 
     def _pack(self):
-        self.buffer = pack(self.format, self.type, self.txId.encode("utf-8"),
+        self.buffer = pack(self.format, self.type.value, self.txId.encode("utf-8"),
                            self.commId.encode("utf-8"), self.data.encode("utf-8"))
 
     def _unpack(self):
-        type,  txId,  commId, data = unpack(self.format, self.buffer)
-        self.type = type
+        _type, txId,  commId, data = unpack(self.format, self.buffer)
+        self.type = enum_from_value(Types, _type)
         self.txId = txId.decode("utf-8")
         self.txId = self.txId.split('\0')[0]
         self.commId = commId.decode("utf-8")
@@ -34,7 +35,7 @@ class UDP_PDU:
         self.data = self.data.split('\0')[0]
 
     def __str__(self):
-        return f"type={self.type} \t txId={self.txId} \t commId={self.commId} \t data={self.data}"
+        return f"type={self.type.name} \t txId={self.txId} \t commId={self.commId} \t data={self.data}"
 
 
 def _config_socket(socktype, port):
@@ -65,11 +66,14 @@ def recive_from(s):
     pdu = UDP_PDU()
     (buff, (ip, port)) = s.recvfrom(1024)
     pdu.load_buffer(buff)
+    print_dbg(f"REBUT {pdu}")
     return pdu, (ip, port)
 
 
 def send_to(s, pdu, ip, port):
     s.sendto(pdu.buffer, (ip, port))
+    print_dbg(f"ENVIAT {pdu}")
+
 
 
 

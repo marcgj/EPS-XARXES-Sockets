@@ -1,6 +1,16 @@
 
+_debug = False
+
+
+def _debug_on():
+    global _debug
+    _debug = True
+
+
 def print_dbg(string: str):
-    print(f"DEBUG >> {string}")
+    global _debug
+    if _debug:
+        print(f"DEBUG >> {string}")
 
 
 def print_msg(string: str):

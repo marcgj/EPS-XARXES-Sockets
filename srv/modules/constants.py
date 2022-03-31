@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Types(Enum):
     REG_REQ = 0xa0
     REG_ACK = 0xa1
@@ -21,7 +22,14 @@ class Types(Enum):
     SET_DATA = 0xc4
     GET_DATA = 0xc5
 
-    ZEROS = "0000000000"
+
+def enum_from_value(enum, value):
+    for elem in enum:
+        if elem.value == value:
+            return elem
+
+
+ZEROS = "0000000000"
 
 
 class Status(Enum):

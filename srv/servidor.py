@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import sys, signal
-from srv.modules.terminal import *
+import sys
+import signal
+from srv.modules.terminal import print_dbg, print_err, _debug_on
 from srv.modules.config import ServerCfg
-import srv.modules.globals as g
 from srv.modules.sockets import config_UDP, config_TCP
-from srv.modules.register import RegisterService
+from srv.modules.conexions import UDPService
 
 cfg_filename = "server.cfg"
 authorized_filename = "bbdd_dev.dat"
@@ -18,14 +18,14 @@ def siging_handler(s, f):
 def main():
     signal.signal(signal.SIGINT, siging_handler)
     handle_args()
-    g.cfg = ServerCfg(cfg_filename, authorized_filename)
-    g.cfg.print_cfg()
-    g.cfg.print_devices()
+    cfg = ServerCfg(cfg_filename, authorized_filename)
+    cfg.print_cfg()
+    cfg.print_devices()
 
-    g.sockTCP = config_TCP(g.cfg.tcp)
-    g.sockUDP = config_UDP(g.cfg.udp)
-    reg = RegisterService(g.cfg, g.sockUDP)
-    reg.run()
+    sockUDP = config_UDP(cfg.udp)
+    udpService = UDPService(cfg, sockUDP)
+
+    sockTCP = config_TCP(cfg.tcp)
 
 
 def handle_args():
@@ -37,10 +37,11 @@ def handle_args():
     while i < argc:
         arg = sys.argv[i]
         if arg == "-c":
-            g.cfg_filename = sys.argv[i + 1]
+            global cfg_filename
+            cfg_filename = sys.argv[i + 1]
             i += 2
         if arg == '-d':
-            g.debug = True
+            _debug_on()
             print_dbg("Mode debug activat")
             i += 1
         else:

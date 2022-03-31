@@ -2,8 +2,6 @@ from srv.modules.terminal import print_msg, print_err
 from srv.modules.constants import Status
 from srv.modules.terminal import print_dbg
 
-# Parametres per defecte
-
 
 class Device:
     def __init__(self, deviceid: str):
