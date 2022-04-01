@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 import signal
 from srv.modules.terminal import print_dbg, print_err, _debug_on
@@ -22,10 +23,10 @@ def main():
     cfg.print_cfg()
     cfg.print_devices()
 
-    sockUDP = config_UDP(cfg.udp)
-    udpService = UDPService(cfg, sockUDP)
-
     sockTCP = config_TCP(cfg.tcp)
+    sockUDP = config_UDP(cfg.udp)
+
+    udpService = UDPService(cfg, sockUDP)
 
 
 def handle_args():

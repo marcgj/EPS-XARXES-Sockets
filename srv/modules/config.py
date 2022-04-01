@@ -19,6 +19,9 @@ class Device:
         self.status = newStatus
         print_dbg(f"Status del dispositiu {self.id} es {self.status.name}")
 
+    def validate_pkt(self, pkt):
+        return pkt.ip == self.ip and pkt.commId == self.commId
+
 
 class ServerCfg:
     # Possible millora: fer anar configparse

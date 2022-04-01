@@ -9,7 +9,7 @@ from srv.modules.terminal import print_dbg
 
 class AliveService:
     w = 3
-    x = 2
+    x = 3
 
     def __init__(self, cfg, sock):
         self.sock = sock
@@ -17,7 +17,7 @@ class AliveService:
         self.run()
 
     def _handler(self):
-        print_dbg("Fill creat per atendre els alives")
+        print_dbg("Fill creat per atendre els ALIVE")
         while True:
             for device in self.cfg.devices.values():
                 if device.status != Status.SEND_ALIVE:

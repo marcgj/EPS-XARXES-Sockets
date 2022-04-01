@@ -36,7 +36,7 @@ class UDPService:
 
             elif rcv_pkt.type == Types.ALIVE:
                 device = self.cfg.devices[rcv_pkt.txId]
-                if ip != device.ip or rcv_pkt.commId != device.commId:
+                if not device.validate_pkt(rcv_pkt):
                     print_dbg(f"Discrepancies en el paquet ALIVE del dispositiu {device.id}")
                     alive_rej_pkg = UDP_PDU(Types.ALIVE_REJ, self.cfg.id, device.commId, device.id)
                     send_to(self.sock, alive_rej_pkg, ip, port)

@@ -34,15 +34,14 @@ class RegisterProcedure:
 
                     if rcv_pkt.type == Types.REG_INFO:
                         # TODO posar en una funcio a part el comparar
-                        if ip != self.device.ip or rcv_pkt.commId != self.device.commId:
+                        if not self.device.validate_pkt(rcv_pkt) or not rcv_pkt.data:
                             print_dbg(f"Discrepancies en el paquet REG_INFO del dispositiu {self.device.id}")
                             info_nack_pkg = UDP_PDU(Types.INFO_NACK, self.cfg.id, self.device.commId,
-                                                    "Error en els camps d'identificacio del servidor")
+                                                    "Error en els camps de la pdu")
                             send_to(self.sock, info_nack_pkg, ip, port)
                             self.device.change_status(Status.DISCONNECTED)
                             return
 
-                        # TODO control de errors
                         self.device.portTCP, self.device.elements = self._process_data(rcv_pkt.data)
 
                         info_ack_pkg = UDP_PDU(Types.INFO_ACK, self.cfg.id, self.device.commId, self.cfg.tcp)
