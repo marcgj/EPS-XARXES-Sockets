@@ -1,10 +1,10 @@
 import threading
 
+from srv.modules.alive import AliveService
 from srv.modules.constants import *
+from srv.modules.register import RegisterProcedure
 from srv.modules.sockets import *
 from srv.modules.terminal import print_dbg
-from srv.modules.register import RegisterProcedure
-from srv.modules.alive import AliveService
 
 
 class UDPService:
@@ -65,9 +65,3 @@ class UDPService:
     def _run(self):
         t = threading.Thread(target=self._handler, args=())
         t.start()
-
-
-
-
-
-

@@ -40,4 +40,3 @@ class Status(Enum):
     WAIT_ACK_INFO = 0xf4
     REGISTERED = 0xf5
     SEND_ALIVE = 0xf6
-

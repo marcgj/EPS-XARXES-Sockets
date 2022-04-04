@@ -1,7 +1,8 @@
 import socket
-from srv.modules.terminal import print_msg, print_err, print_dbg
-from srv.modules.constants import enum_from_value, Types
 from struct import pack, unpack
+
+from srv.modules.constants import enum_from_value, Types
+from srv.modules.terminal import print_msg, print_err, print_dbg
 
 
 class UDP_PDU:
@@ -25,7 +26,7 @@ class UDP_PDU:
                            self.commId.encode("utf-8"), self.data.encode("utf-8"))
 
     def _unpack(self):
-        _type, txId,  commId, data = unpack(self.format, self.buffer)
+        _type, txId, commId, data = unpack(self.format, self.buffer)
         self.type = enum_from_value(Types, _type)
         self.txId = txId.decode("utf-8")
         self.txId = self.txId.split('\0')[0]
@@ -73,8 +74,3 @@ def recive_from(s):
 def send_to(s, pdu, ip, port):
     s.sendto(pdu.buffer, (ip, port))
     print_dbg(f"ENVIAT {pdu}")
-
-
-
-
-

@@ -1,8 +1,8 @@
 import threading
 import time
 
-from srv.modules.constants import *
 from srv.modules.config import Device
+from srv.modules.constants import *
 from srv.modules.sockets import *
 from srv.modules.terminal import print_dbg
 
@@ -49,4 +49,3 @@ class AliveService:
     def _run(self):
         t = threading.Thread(target=self._handler, args=())
         t.start()
-

@@ -1,6 +1,6 @@
-from srv.modules.terminal import print_msg, print_err
 from srv.modules.constants import Status
 from srv.modules.terminal import print_dbg
+from srv.modules.terminal import print_msg, print_err
 
 
 class Device:
@@ -9,6 +9,7 @@ class Device:
     i conte un metode per  canviar el estat, i comprovar si les dades d'un paquet es corresponen
     amb les corresponents/assignades al dispositiu
     """
+
     def __init__(self, deviceid: str):
         self.id = deviceid
         self.status = Status.DISCONNECTED
@@ -39,6 +40,7 @@ class ServerCfg:
 
     Ta
     """
+
     # Possible millora: fer anar configparse
     def __init__(self, cfgfilename: str, allowedsfilename: str):
         try:
@@ -87,4 +89,3 @@ class ServerCfg:
         for device in self.devices.values():
             print_msg(f"\t {device.id}  \t {device.status.name}")
         print_msg("-----------------------------------")
-

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-import os
-import sys
 import signal
-from srv.modules.terminal import print_dbg, print_err, _debug_on
+import sys
+
+from srv.modules.conexions import UDPService
 from srv.modules.config import ServerCfg
 from srv.modules.sockets import config_UDP, config_TCP
-from srv.modules.conexions import UDPService
+from srv.modules.terminal import print_dbg, print_err, _debug_on
 
 cfg_filename = "server.cfg"
 authorized_filename = "bbdd_dev.dat"
@@ -52,8 +52,3 @@ def handle_args():
 
 if __name__ == '__main__':
     main()
-
-
-
-
-

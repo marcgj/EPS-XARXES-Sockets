@@ -11,7 +11,6 @@
 #include "headers/globals.h"
 
 
-
 void load_config(char *filename, ClientCfg *clientConfig) {
     FILE *f = fopen(filename, "r");
     if (f == NULL) {
@@ -83,7 +82,7 @@ Element *getElement(ClientCfg *c, char *str) {
     return NULL;
 }
 
-void print_elements(int elemc, int dbg,  Element elements[elemc]) {
+void print_elements(int elemc, int dbg, Element elements[elemc]) {
     char tag[16] = "MESSAGE >>";
     if (dbg) strcpy(tag, "DEBUG >>");
 

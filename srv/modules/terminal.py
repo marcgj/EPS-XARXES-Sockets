@@ -1,4 +1,5 @@
 import datetime
+
 _debug = False
 
 
@@ -24,4 +25,3 @@ def print_msg(string: str):
 
 def print_err(string: str):
     print_wrapper(f"\033[91mERROR >> {string}\033[0m")
-
