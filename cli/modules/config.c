@@ -87,11 +87,11 @@ void print_elements(int elemc, int dbg,  Element elements[elemc]) {
     char tag[16] = "MESSAGE >>";
     if (dbg) strcpy(tag, "DEBUG >>");
 
-    printf("%s    Parametres \t Valors\n", tag);
-    printf("%s    ----------- \t ------------------\n", tag);
+    print_alt(stdout, tag, "Parametres \t Valors\n");
+    print_alt(stdout, tag, "----------- \t ------------------\n");
     for (int i = 0; i < elemc; ++i) {
         Element elem = elements[i];
-        printf("%s    %s \t\t %s\n", tag, elem.elem_string, elem.value);
+        print_alt(stdout, tag, "%s \t\t %s\n", elem.elem_string, elem.value);
     }
 }
 

@@ -34,7 +34,7 @@ class RegisterProcedure:
 
                     if rcv_pkt.type == Types.REG_INFO:
                         # TODO posar en una funcio a part el comparar
-                        if not self.device.validate_pkt(rcv_pkt) or not rcv_pkt.data:
+                        if not self.device.validate_pkt(rcv_pkt, ip) or not rcv_pkt.data:
                             print_dbg(f"Discrepancies en el paquet REG_INFO del dispositiu {self.device.id}")
                             info_nack_pkg = UDP_PDU(Types.INFO_NACK, self.cfg.id, self.device.commId,
                                                     "Error en els camps de la pdu")

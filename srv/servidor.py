@@ -20,7 +20,7 @@ def main():
     signal.signal(signal.SIGINT, siging_handler)
     handle_args()
     cfg = ServerCfg(cfg_filename, authorized_filename)
-    cfg.print_cfg()
+    print(cfg)
     cfg.print_devices()
 
     sockTCP = config_TCP(cfg.tcp)

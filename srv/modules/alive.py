@@ -8,24 +8,28 @@ from srv.modules.terminal import print_dbg
 
 
 class AliveService:
-    w = 3
-    x = 3
+    """
+    Genera un nou proces que revisa els temps que fa que no es reb un ALIVE dels diferents dispositius
+    Tambe te un metode que permet reiniciar els comptadors d'un dispositiu
+    """
+    _w = 3
+    _x = 3
 
     def __init__(self, cfg, sock):
-        self.sock = sock
-        self.cfg = cfg
-        self.run()
+        self._sock = sock
+        self._cfg = cfg
+        self._run()
 
     def _handler(self):
         print_dbg("Fill creat per atendre els ALIVE")
         while True:
-            for device in self.cfg.devices.values():
+            for device in self._cfg.devices.values():
                 if device.status != Status.SEND_ALIVE:
                     continue
                 now = time.time()
-                if now - device.lastAlive > self.w:
-                    if device.missedAlives >= self.x:
-                        print_err(f"No s'han rebut {self.x} alives consequtius de {device.id}")
+                if now - device.lastAlive > self._w:
+                    if device.missedAlives >= self._x:
+                        print_err(f"No s'han rebut {self._x} alives consequtius de {device.id}")
                         device.change_status(Status.DISCONNECTED)
                     else:
                         device.missedAlives += 1
@@ -39,10 +43,10 @@ class AliveService:
         device.lastAlive = time.time()
         device.missedAlives = 0
 
-        alive_pkt = UDP_PDU(Types.ALIVE, self.cfg.id, device.commId, device.id)
-        send_to(self.sock, alive_pkt, device.ip, device.portUDP)
+        alive_pkt = UDP_PDU(Types.ALIVE, self._cfg.id, device.commId, device.id)
+        send_to(self._sock, alive_pkt, device.ip, device.portUDP)
 
-    def run(self):
+    def _run(self):
         t = threading.Thread(target=self._handler, args=())
         t.start()
 

@@ -71,22 +71,29 @@ void handle_terminal() {
 
 }
 
-void vaList_generator(va_list *outList, ...) {
-    va_start(*outList, outList);
-}
 
 void print(FILE *fd, char *tag, char *format, va_list args) {
     char buffer[264] = "";
+    time_t t1;
+    struct tm *t2;
+    time(&t1);
+    t2 = localtime(&t1);
+    strftime(buffer, 128, "%H:%M:%S | ", t2);
 
-    strcpy(buffer, tag);
+    strcat(buffer, tag);
     strcat(buffer, " >> ");
 
     strcat(buffer, format);
     vfprintf(fd, buffer, args);
 }
 
+void print_alt(FILE *fd, char *tag, char *format, ...) {
+    va_list args;
+    va_start(args, format);
 
-//https://www.cplusplus.com/reference/cstdio/vprintf/
+    print(fd, tag, format, args);
+}
+
 void print_error(char *format, ...) {
     va_list args;
     va_start(args, format);
@@ -111,3 +118,4 @@ void print_message(char *format, ...) {
 
     print(stdout, "MESSAGE", format, args);
 }
+
