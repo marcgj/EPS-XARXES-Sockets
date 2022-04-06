@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "headers/config.h"
 #include "headers/globals.h"
@@ -78,7 +79,7 @@ void print(FILE *fd, char *tag, char *format, va_list args) {
     struct tm *t2;
     time(&t1);
     t2 = localtime(&t1);
-    strftime(buffer, 128, "%H:%M:%S | ", t2);
+    strftime(buffer, 128, "%H:%M:%S: ", t2);
 
     strcat(buffer, tag);
     strcat(buffer, " >> ");

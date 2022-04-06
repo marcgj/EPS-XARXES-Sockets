@@ -10,7 +10,7 @@ def _debug_on():
 
 def print_wrapper(str):
     t = datetime.datetime.now().strftime("%H:%M:%S")
-    print(f"{t} | {str}")
+    print(f"{t}: {str}")
 
 
 def print_dbg(string: str):
