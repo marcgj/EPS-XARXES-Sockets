@@ -83,8 +83,8 @@ Element *getElement(ClientCfg *c, char *str) {
 }
 
 void print_elements(int elemc, int dbg, Element elements[elemc]) {
-    char tag[16] = "MESSAGE >>";
-    if (dbg) strcpy(tag, "DEBUG >>");
+    char tag[16] = "MESSAGE";
+    if (dbg) strcpy(tag, "DEBUG");
 
     print_alt(stdout, tag, "Parametres \t Valors\n");
     print_alt(stdout, tag, "----------- \t ------------------\n");

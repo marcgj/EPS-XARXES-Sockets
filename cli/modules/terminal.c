@@ -26,11 +26,12 @@ void handle_terminal() {
     token = strtok(buffer, " ");
 
     if (strcmp(token, "stat") == 0) {
-        printf("---------------------------------------\n");
-        printf("Id= %s\n", cfg.id);
-        printf("Status= %i\n\n", status);
+        print_message("---------------------------------------\n");
+        print_message("Id= %s\n", cfg.id);
+        print_message("Status= %i\n", status);
+        print_message("\n");
         print_elements(cfg.elemc, 0, cfg.elements);
-        printf("---------------------------------------\n");
+        print_message("---------------------------------------\n");
     } else if (strcmp(token, "set") == 0) {
         token = strtok(NULL, " ");
         if (token == NULL) {
