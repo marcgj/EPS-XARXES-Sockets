@@ -21,6 +21,7 @@ class RegisterProcedure:
 
     def _handler(self):
         print_dbg(f"Fill creat per el registre de {self.device.id}")
+
         while self.device.status is not Status.REGISTERED:
             if self.device.status == Status.DISCONNECTED:
                 reg_ack = UDP_PDU(Types.REG_ACK, self.cfg.id, self.device.commId, self.port)
@@ -29,7 +30,7 @@ class RegisterProcedure:
 
             if self.device.status == Status.WAIT_INFO:
                 i = select([self.sock], [], [], self.z)[0]
-                if self.sock in i:
+                if i:
                     rcv_pkt, (ip, port) = recive_from(self.sock)
 
                     if rcv_pkt.type == Types.REG_INFO:

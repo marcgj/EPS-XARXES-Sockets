@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#! python3
 import signal
 import sys
 
 from srv.modules.conexions import UDPService
 from srv.modules.config import ServerCfg
+from srv.modules.sendrecive import SendReciveService
 from srv.modules.sockets import config_UDP, config_TCP
 from srv.modules.terminal import print_dbg, print_err, _debug_on
 
@@ -27,6 +28,7 @@ def main():
     sockUDP = config_UDP(cfg.udp)
 
     udpService = UDPService(cfg, sockUDP)
+    sendRecieveService = SendReciveService(cfg, sockTCP)
 
 
 def handle_args():

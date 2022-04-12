@@ -14,8 +14,8 @@ class Device:
         self.id = deviceid
         self.status = Status.DISCONNECTED
 
-        self.ip = None
-        self.commId = ""
+        self.ip = "############"
+        self.commId = "############"
 
         self.portUDP = None
         self.portTCP = None
@@ -31,6 +31,13 @@ class Device:
 
     def validate_pkt(self, pkt, ip):
         return ip == self.ip and pkt.commId == self.commId
+
+
+def _elements_to_str(elems: dict):
+    result = ""
+    for s in elems.keys():
+        result += s + " "
+    return result
 
 
 class ServerCfg:
@@ -84,8 +91,9 @@ class ServerCfg:
 
     def print_devices(self):
         print_msg("------------- Devices -------------")
-        print_msg("\t Device ID     \t Status")
-        print_msg("\t------------   \t--------------")
+        print_msg("\t Device ID    \t Status         \t CommId         \t IP             \t Elements")
+        print_msg("\t------------  \t--------------  \t--------------  \t--------------  \t--------------")
         for device in self.devices.values():
-            print_msg(f"\t {device.id}  \t {device.status.name}")
+            print_msg(f"\t {device.id: <13} \t {device.status.name: <13} \t\t {device.commId: <13} "
+                      f"\t\t {device.ip: <13} \t\t {_elements_to_str(device.elements): <13} ")
         print_msg("-----------------------------------")

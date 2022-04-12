@@ -26,7 +26,6 @@ struct sockaddr_in sockaddr_in_generator(char *address, int port) {
     return result;
 }
 
-
 int configure_socket(int port, int type) {
     struct sockaddr_in addr;
     int sock = socket(AF_INET, type, 0);
