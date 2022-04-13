@@ -46,6 +46,13 @@ class SendReciveService:
 
     def handle_incoming_connection(self):
         sock, (ip, port) = self.sock.accept()
+
+        i = select([sock], [], [], self.m)[0]
+        if not i:
+            print_err("No s'ha rebut cap paquet en {self.m}s")
+            sock.close()
+            return
+
         rcv_pkt = recive(sock)
 
         if rcv_pkt.type == Types.SEND_DATA:
