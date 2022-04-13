@@ -2,19 +2,19 @@ cmake_minimum_required(VERSION 3.21)
 project(Xarxes_Practica1 C)
 
 set(CMAKE_C_STANDARD 17)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../cli)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ..)
 
-add_executable(client_meu cli/client.c
-        cli/modules/config.c cli/modules/headers/config.h
-        cli/modules/conexions.c cli/modules/headers/conexions.h
-        cli/modules/terminal.c cli/modules/headers/terminal.h
-        cli/modules/alive.c cli/modules/headers/alive.h
-        cli/modules/pdu.c cli/modules/headers/pdu.h
-        cli/modules/register.c cli/modules/headers/register.h
-        cli/modules/sendrecive.c cli/modules/headers/sendrecive.h
-        cli/modules/socket.c cli/modules/headers/socket.h
-        cli/modules/headers/globals.h
-        cli/modules/globals.c)
+add_executable(client client.c
+        client_modules/config.c client_modules/headers/config.h
+        client_modules/conexions.c client_modules/headers/conexions.h
+        client_modules/terminal.c client_modules/headers/terminal.h
+        client_modules/alive.c client_modules/headers/alive.h
+        client_modules/pdu.c client_modules/headers/pdu.h
+        client_modules/register.c client_modules/headers/register.h
+        client_modules/sendrecive.c client_modules/headers/sendrecive.h
+        client_modules/socket.c client_modules/headers/socket.h
+        client_modules/headers/globals.h
+        client_modules/globals.c)
 
 cmake_minimum_required(VERSION 3.21)
 
