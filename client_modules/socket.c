@@ -1,6 +1,9 @@
+#define _POSIX_SOURCE
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
+
 
 #include "headers/globals.h"
 #include "headers/socket.h"
@@ -21,7 +24,7 @@ struct sockaddr_in sockaddr_in_generator(char *address, int port) {
 
     result.sin_family = AF_INET;
     result.sin_port = htons(port);
-    result.sin_addr.s_addr = (((struct in_addr *) ent->h_addr)->s_addr);
+    result.sin_addr.s_addr = (((struct in_addr *) ent->h_addr_list[0])->s_addr);
 
     return result;
 }

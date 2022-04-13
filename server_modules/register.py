@@ -1,4 +1,5 @@
 import threading
+import time
 from random import randint
 from select import select
 
@@ -34,11 +35,17 @@ class RegisterProcedure:
                     rcv_pkt, (ip, port) = recive_from(self.sock)
 
                     if rcv_pkt.type == Types.REG_INFO:
-                        # TODO posar en una funcio a part el comparar
-                        if not self.device.validate_pkt(rcv_pkt, ip) or not rcv_pkt.data:
-                            print_dbg(f"Discrepancies en el paquet REG_INFO del dispositiu {self.device.id}")
-                            info_nack_pkg = UDP_PDU(Types.INFO_NACK, self.cfg.id, self.device.commId,
-                                                    "Error en els camps de la pdu")
+                        if not self.device.validate_pkt(rcv_pkt, ip):
+                            print_err(f"Error en el camp commId del dispositiu {self.device.id}")
+                            reg_rej_pkg = UDP_PDU(Types.REG_REJ, self.cfg.id, self.device.commId, "Error commId")
+                            send_to(self.sock, reg_rej_pkg, ip, port)
+                            self.device.change_status(Status.DISCONNECTED)
+                            return
+
+                        if not rcv_pkt.data:
+                            print(rcv_pkt.data)
+                            print_err(f"Discrepancies en el camp dades del REG_INFO del dispositiu {self.device.id}")
+                            info_nack_pkg = UDP_PDU(Types.INFO_NACK, self.cfg.id, self.device.commId, "Error dades")
                             send_to(self.sock, info_nack_pkg, ip, port)
                             self.device.change_status(Status.DISCONNECTED)
                             return
@@ -48,11 +55,12 @@ class RegisterProcedure:
                         info_ack_pkg = UDP_PDU(Types.INFO_ACK, self.cfg.id, self.device.commId, self.cfg.tcp)
                         send_to(self.sock, info_ack_pkg, ip, port)
                         self.device.change_status(Status.REGISTERED)
+                        self.device.lastAlive = time.time()
                         return
                 else:
-                    print_dbg(f"No s'ha rebut el REG_INFO del dispositiu {self.device.id}")
+                    print_err(f"No s'ha rebut el REG_INFO del dispositiu {self.device.id}")
                     self.device.change_status(Status.DISCONNECTED)
-                return
+                    return
 
     def run(self):
         t = threading.Thread(target=self._handler, args=())

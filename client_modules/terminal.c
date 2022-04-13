@@ -1,8 +1,11 @@
+#define _POSIX_SOURCE
 #include <printf.h>
+#include <stdarg.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <sys/select.h>
 
 #include "headers/config.h"
 #include "headers/globals.h"

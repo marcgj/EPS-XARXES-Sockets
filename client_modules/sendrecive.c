@@ -1,9 +1,7 @@
-//
-// Created by Marc Gaspà Joval on 25/3/22.
-//
-
+#define _POSIX_SOURCE
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/select.h>
 #include <signal.h>
 #include <unistd.h>
 #include <stdlib.h>

@@ -62,8 +62,8 @@ class TCP_PDU:
                            self.element.encode("utf-8"), self.value.encode("utf-8"), self.info.encode("utf-8"))
 
     def _unpack(self):
-        _type, txId, commId, element, value, info = unpack(self.format, self.buffer)
-        self.type = enum_from_value(Types, _type)
+        type, txId, commId, element, value, info = unpack(self.format, self.buffer)
+        self.type = enum_from_value(Types, type)
         self.txId = txId.decode("utf-8")
         self.txId = self.txId.split('\0')[0]
         self.commId = commId.decode("utf-8")
@@ -120,6 +120,9 @@ def send_to(s: socket, pdu, ip, port):
 def recive(s: socket):
     pdu = TCP_PDU()
     buff = s.recv(1024)
+    if not buff:
+        return None
+
     pdu.load_buffer(buff)
     print_dbg(f"REBUT {pdu}")
     return pdu

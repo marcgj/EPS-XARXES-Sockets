@@ -3,6 +3,7 @@ project(Xarxes_Practica1 C)
 
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ..)
+add_definitions("-ansi -pedantic -Wall")
 
 add_executable(client client.c
         client_modules/config.c client_modules/headers/config.h
@@ -18,4 +19,3 @@ add_executable(client client.c
 
 cmake_minimum_required(VERSION 3.21)
 
-add_definitions("-ansi -pedantic -Wall")

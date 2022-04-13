@@ -32,9 +32,8 @@ class UDPService:
                 continue
 
             if rcv_pkt.type == Types.REG_REQ:
-
-                if rcv_pkt.commId != ZEROS and rcv_pkt.data:
-                    print_dbg("Error en el paquet REG_REQ")
+                if rcv_pkt.commId != ZEROS or rcv_pkt.data:
+                    print_err(f"Rebut REG_REQ erroni de {rcv_pkt.txId}")
                     reg_rej_pkt = UDP_PDU(Types.REG_REJ, self._cfg.id, ZEROS, "")
                     send_to(self._sock, reg_rej_pkt, ip, port)
                     continue
@@ -53,9 +52,10 @@ class UDPService:
                 device = self._cfg.devices.get(rcv_pkt.txId)
                 if not (device.status == Status.SEND_ALIVE or device.status == Status.REGISTERED):
                     print_err(f"Rebut alive no esperat")
+                    device.change_status(Status.DISCONNECTED)
                     continue
 
-                if not device.validate_pkt(rcv_pkt, ip):
+                if not device.validate_pkt(rcv_pkt, ip) or rcv_pkt.data:
                     print_err(f"Discrepancies en el paquet ALIVE del dispositiu {device.id}")
                     alive_rej_pkg = UDP_PDU(Types.ALIVE_REJ, self._cfg.id, device.commId, device.id)
                     send_to(self._sock, alive_rej_pkg, ip, port)

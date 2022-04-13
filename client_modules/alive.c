@@ -1,7 +1,9 @@
+#define _POSIX_SOURCE
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/select.h>
 #include "headers/alive.h"
 #include "headers/pdu.h"
 #include "headers/globals.h"

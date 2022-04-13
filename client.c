@@ -1,14 +1,9 @@
-//
-// Created by Marc Gaspà Joval on 2/3/22.
-//
-
+#define _POSIX_SOURCE
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <stdio.h>
 #include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <sys/wait.h>
 
 #include "client_modules/headers/config.h"
 #include "client_modules/headers/globals.h"

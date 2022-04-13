@@ -1,5 +1,6 @@
 import sys
 import threading
+from os import getcwd
 from select import select
 from socket import socket
 
@@ -14,7 +15,7 @@ def _log_element_change(pdu):
         f = open(f"{pdu.txId}.data", "a")
         s = f"{pdu.info} type={pdu.type.name} element={pdu.element} value={pdu.value}"
         f.write(s + "\n")
-        print_dbg(f"Guardat a {pdu.txId}.data: {s}")
+        print_dbg(f"Guardat a {getcwd()}{pdu.txId}.data: {s}")
         f.close()
         return True
     except OSError as e:
@@ -49,7 +50,7 @@ class SendReciveService:
 
         i = select([sock], [], [], self.m)[0]
         if not i:
-            print_err("No s'ha rebut cap paquet en {self.m}s")
+            print_err(f"No s'ha rebut cap paquet en {self.m}s")
             sock.close()
             return
 
@@ -65,7 +66,6 @@ class SendReciveService:
                 return
 
             if not device.validate_pkt(rcv_pkt, ip):
-                print_err(ip)
                 print_err(f"Error en les dades d'identificacio")
                 data_rej_pkt = TCP_PDU(Types.DATA_REJ, self.cfg.id, device.commId, rcv_pkt.element, rcv_pkt.value)
                 send(sock, data_rej_pkt)
@@ -102,10 +102,10 @@ class SendReciveService:
 
         sock.close()
 
-    def handle_outgoing_conexion(self, type, device, element, value=""):
+    def handle_outgoing_conexion(self, pdu_type, device, element, value=""):
         sock = config_TCP(0)
         try:
-            print_dbg(f"Connect amb {device.ip} i port {device.portTCP}")
+            print_dbg(f"Connect amb {device.ip} al port {device.portTCP}")
             sock.connect((device.ip, int(device.portTCP)))
         except Exception as e:
             print_err(f"Error al fer connect amb {device.id}: {e}")
@@ -113,14 +113,23 @@ class SendReciveService:
             sock.close()
             return
 
-        out_pkt = TCP_PDU(type, self.cfg.id, device.commId, element, value, device.id)
+        out_pkt = TCP_PDU(pdu_type, self.cfg.id, device.commId, element, value, device.id)
         send(sock, out_pkt)
 
         i = select([sock], [], [], self.m)[0]
-        if i:
+        if sock in i:
             rcv_pkt = recive(sock)
+            if rcv_pkt == None:
+                print_err("Rebut buffer buit, segurament el peer ha tancat la conexio")
+                return
+
             if not device.validate_pkt(rcv_pkt, device.ip):
                 print_err("Error en les dades d'identificacio del paquet")
+                sock.close()
+                return
+
+            if rcv_pkt.element != element:
+                print_err("Error el camp element")
                 sock.close()
                 return
 
@@ -133,7 +142,7 @@ class SendReciveService:
                 sock.close()
                 return
             elif rcv_pkt.type == Types.DATA_ACK:
-                rcv_pkt.type = type
+                rcv_pkt.type = pdu_type
                 _log_element_change(rcv_pkt)
             else:
                 print_err(f"Rebut paquet erroni de {device.id}")
@@ -145,3 +154,5 @@ class SendReciveService:
 
 # get GHXE2LWQ6C LUM-0-O
 # set GHXE2LWQ6C LUM-0-I test
+# set LUM-0-I test
+# send LUM-0-I

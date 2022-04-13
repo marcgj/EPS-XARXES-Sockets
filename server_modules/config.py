@@ -30,7 +30,7 @@ class Device:
         print_msg(f"Status del dispositiu {self.id} es {self.status.name}")
 
     def validate_pkt(self, pkt, ip):
-        return ip == self.ip and pkt.commId == self.commId
+        return ip == self.ip and pkt.commId == self.commId and pkt.txId == self.id
 
 
 def _elements_to_str(elems: dict):

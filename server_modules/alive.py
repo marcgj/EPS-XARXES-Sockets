@@ -24,17 +24,20 @@ class AliveService:
         print_dbg("Fill creat per atendre els ALIVE")
         while True:
             for device in self._cfg.devices.values():
-                if device.status != Status.SEND_ALIVE:
-                    continue
                 now = time.time()
-                if now - device.lastAlive > self._w:
-                    if device.missedAlives >= self._x:
-                        print_err(f"No s'han rebut {self._x} alives consequtius de {device.id}")
-                        device.change_status(Status.DISCONNECTED)
-                    else:
-                        device.missedAlives += 1
-
-            time.sleep(0.5)  # Per no malgastar recursos del ordenador
+                if device.status == Status.SEND_ALIVE or device.status == Status.REGISTERED:
+                    if now - device.lastAlive > self._w:
+                        if device.missedAlives >= self._x - 1:
+                            print_err(f"No s'han rebut {self._x} alives consequtius de {device.id}")
+                            device.change_status(Status.DISCONNECTED)
+                        elif device.status == Status.REGISTERED:
+                            print_err(f"No s'ha rebut resposta al primer ALIVE del dispositiu {device.id}")
+                            device.change_status(Status.DISCONNECTED)
+                        else:
+                            print_err(f"No s'ha rebut alive de {device.id}, alives perduts {device.missedAlives + 1}")
+                            device.missedAlives += 1
+                            device.lastAlive = now
+            time.sleep(0.25)  # Per no malgastar recursos del ordenador
 
     def processAlive(self, device: Device):
         if device.status == Status.REGISTERED:
