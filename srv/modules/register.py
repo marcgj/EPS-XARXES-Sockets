@@ -67,6 +67,6 @@ class RegisterProcedure:
         tokenizedElems = split[1].split(';')
 
         for elem in tokenizedElems:
-            elems.update({elem: ""})
+            elems.update({elem: "NONE"})
 
         return port, elems

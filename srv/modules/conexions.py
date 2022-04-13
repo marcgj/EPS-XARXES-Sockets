@@ -27,11 +27,12 @@ class UDPService:
 
         while True:
             rcv_pkt, (ip, port) = recive_from(self._sock)
-            if rcv_pkt.txId not in self._cfg.devices.keys():
+            if not self._cfg.is_authorized_device(rcv_pkt.txId):
                 print_err(f"Dispositiu {rcv_pkt.txId} no esta autoritzat")
                 continue
 
             if rcv_pkt.type == Types.REG_REQ:
+
                 if rcv_pkt.commId != ZEROS and rcv_pkt.data:
                     print_dbg("Error en el paquet REG_REQ")
                     reg_rej_pkt = UDP_PDU(Types.REG_REJ, self._cfg.id, ZEROS, "")
@@ -39,6 +40,9 @@ class UDPService:
                     continue
 
                 device = self._cfg.devices[rcv_pkt.txId]
+                if device.status != Status.DISCONNECTED:
+                    continue
+
                 device.ip = ip
                 device.portUDP = port
 
@@ -46,9 +50,13 @@ class UDPService:
                 procedure.run()
 
             elif rcv_pkt.type == Types.ALIVE:
-                device = self._cfg.devices[rcv_pkt.txId]
+                device = self._cfg.devices.get(rcv_pkt.txId)
+                if not (device.status == Status.SEND_ALIVE or device.status == Status.REGISTERED):
+                    print_err(f"Rebut alive no esperat")
+                    continue
+
                 if not device.validate_pkt(rcv_pkt, ip):
-                    print_dbg(f"Discrepancies en el paquet ALIVE del dispositiu {device.id}")
+                    print_err(f"Discrepancies en el paquet ALIVE del dispositiu {device.id}")
                     alive_rej_pkg = UDP_PDU(Types.ALIVE_REJ, self._cfg.id, device.commId, device.id)
                     send_to(self._sock, alive_rej_pkg, ip, port)
                     device.change_status(Status.DISCONNECTED)

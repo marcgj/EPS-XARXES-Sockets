@@ -70,9 +70,9 @@ class TCP_PDU:
         self.commId = self.commId.split('\0')[0]
         self.element = element.decode("utf-8")
         self.element = self.element.split('\0')[0]
-        self.value = value.decode("utf-8")
+        self.value = value.decode("utf-8", errors="ignore")
         self.value = self.value.split('\0')[0]
-        self.info = info.decode("utf-8")
+        self.info = info.decode("utf-8", errors="ignore")
         self.info = self.info.split('\0')[0]
 
     def __str__(self):
@@ -100,18 +100,31 @@ def config_UDP(port):
 
 def config_TCP(port):
     s = _config_socket(socket.SOCK_STREAM, port)
-    print_msg(f"Obert socket TCP amb port {port}")
+    print_msg(f"Obert socket TCP amb port {s.getsockname()[1]}")
     return s
 
 
 def recive_from(s):
     pdu = UDP_PDU()
-    (buff, (ip, port)) = s.recvfrom(1024)
+    buff, (ip, port) = s.recvfrom(1024)
     pdu.load_buffer(buff)
     print_dbg(f"REBUT {pdu}")
     return pdu, (ip, port)
 
 
-def send_to(s, pdu, ip, port):
+def send_to(s: socket, pdu, ip, port):
     s.sendto(pdu.buffer, (ip, port))
+    print_dbg(f"ENVIAT {pdu}")
+
+
+def recive(s: socket):
+    pdu = TCP_PDU()
+    buff = s.recv(1024)
+    pdu.load_buffer(buff)
+    print_dbg(f"REBUT {pdu}")
+    return pdu
+
+
+def send(s, pdu):
+    s.send(pdu.buffer)
     print_dbg(f"ENVIAT {pdu}")

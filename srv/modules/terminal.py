@@ -1,7 +1,7 @@
 import datetime
 import os
-
-from srv.modules.constants import Status
+from threading import Lock
+from srv.modules.constants import Status, Types
 
 _debug = False
 
@@ -11,9 +11,16 @@ def _debug_on():
     _debug = True
 
 
+lock = Lock()
+
+
+# Per aquesta funcio he de fer anar un lock ja que al tindre prints en diferents procesos a vegades
+# si escribien tots alhora apareixia tot en una sola linia
 def print_wrapper(str):
+    lock.acquire()
     t = datetime.datetime.now().strftime("%H:%M:%S")
-    print(f"{t}: {str}")
+    print(f"{t}: {str}", end="\n", flush=True)
+    lock.release()
 
 
 def print_dbg(string: str):
@@ -30,7 +37,7 @@ def print_err(string: str):
     print_wrapper(f"\033[91mERROR >> {string}\033[0m")
 
 
-def handle_terminal(text: str, cfg):
+def handle_terminal(text: str, service):
     splitted = text.split(" ")
     cmd = splitted[0]
 
@@ -40,7 +47,7 @@ def handle_terminal(text: str, cfg):
             return
 
         deviceId = splitted[1]
-        device = cfg.devices.get(deviceId)
+        device = service.cfg.devices.get(deviceId)
 
         if not device:
             print_err(f"Dispositiu {deviceId} no exesteix")
@@ -52,17 +59,17 @@ def handle_terminal(text: str, cfg):
 
         elementId = splitted[2]
 
-        if elementId not in device.elements:
+        if not device.elements.get(elementId):
             print_err(f"El element {elementId} no exesteix")
             return
 
-        if elementId[:-1] != "I":
-            print_err("El element ha de ser un actuador 'I'")
+        if elementId[-1] != "I":
+            print_err(f"El element ha de ser un actuador 'I'")
             return
 
         newVal = splitted[3]
 
-        # todo tcpshit
+        service.handle_outgoing_conexion(Types.SET_DATA, device, elementId, newVal)
 
     elif cmd == "get":
         if len(splitted) != 3:
@@ -70,7 +77,7 @@ def handle_terminal(text: str, cfg):
             return
 
         deviceId = splitted[1]
-        device = cfg.devices.get(deviceId)
+        device = service.cfg.devices.get(deviceId)
 
         if not device:
             print_err(f"Dispositiu {deviceId} no exesteix")
@@ -82,20 +89,17 @@ def handle_terminal(text: str, cfg):
 
         elementId = splitted[2]
 
-        if elementId not in device.elements:
+        if not device.elements.get(elementId):
             print_err(f"El element {elementId} no exesteix")
             return
 
-        if elementId[:-1] != "I":
-            print_err("El element ha de ser un actuador 'I'")
-            return
-
-        # todo tcpshit
+        service.handle_outgoing_conexion(Types.GET_DATA, device, elementId)
 
     elif cmd == "list":
-        cfg.print_devices()
+        service.cfg.print_devices()
     elif cmd == "quit":
         print_msg("Tancant el servidor")
         os._exit(1)
     else:
-        print_err(f"Comanda {cmd} no reconeguda")
+        if cmd:
+            print_err(f"Comanda {cmd} no reconeguda")

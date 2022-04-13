@@ -27,7 +27,7 @@ class Device:
 
     def change_status(self, newStatus):
         self.status = newStatus
-        print_dbg(f"Status del dispositiu {self.id} es {self.status.name}")
+        print_msg(f"Status del dispositiu {self.id} es {self.status.name}")
 
     def validate_pkt(self, pkt, ip):
         return ip == self.ip and pkt.commId == self.commId
@@ -36,8 +36,8 @@ class Device:
 def _elements_to_str(elems: dict):
     result = ""
     for s in elems.keys():
-        result += s + " "
-    return result
+        result += s + ";"
+    return result[:-1]
 
 
 class ServerCfg:
@@ -45,7 +45,6 @@ class ServerCfg:
     Classe que carrega d'un fixter i encapsula tota la informacio referent a la configuraio del servidor i
     els dispositius autoritzats
 
-    Ta
     """
 
     # Possible millora: fer anar configparse
@@ -97,3 +96,7 @@ class ServerCfg:
             print_msg(f"\t {device.id: <13} \t {device.status.name: <13} \t\t {device.commId: <13} "
                       f"\t\t {device.ip: <13} \t\t {_elements_to_str(device.elements): <13} ")
         print_msg("-----------------------------------")
+
+    def is_authorized_device(self, deviceId):
+        return deviceId in self.devices.keys()
+

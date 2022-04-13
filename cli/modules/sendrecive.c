@@ -40,7 +40,6 @@ void send_element(Element elem) {
         int sock = configure_tcp(cfg.local_TCP + 1);
 
         if (connect(sock, (struct sockaddr *) &addr_srv, sizeof(addr_srv)) < 0) {
-            //TODO mirar si aquest es el comportament
             print_error("Ha fallat el connect del enviament de dades");
             perror("");
             exit(1);
@@ -135,11 +134,10 @@ void handle_incoming_connection(int sock) {
             switch (rcv_pkt.type) {
                 case SET_DATA:
                     print_PDU_TCP(rcv_pkt, "REBUT SET_DATA");
-
                     if (rcv_pkt.element[6] == 'I') {
                         strcpy(elem->value, rcv_pkt.value);
                         PDU_TCP data_ack = generate_PDU_TCP_Elem(DATA_ACK, cfg.id, srv_info.comm_id, *elem);
-                        send_pdu_TCP(sock2, data_ack, "DATA_ACK");
+                        send_pdu_TCP(sock2, data_ack, "ENVIAT DATA_ACK");
                         return;
                     }
                     strcpy(data_nack_pkt.info, "Error nomes es pot fer set a elements tipus I");
@@ -148,8 +146,8 @@ void handle_incoming_connection(int sock) {
                 case GET_DATA:
                     print_PDU_TCP(rcv_pkt, "REBUT GET_DATA");
                     PDU_TCP data_ack = generate_PDU_TCP_Elem(DATA_ACK, cfg.id, srv_info.comm_id, *elem);
-                    send_pdu_TCP(sock2, data_ack, "DATA_ACK");
-                    break;
+                    send_pdu_TCP(sock2, data_ack, "ENVIAT DATA_ACK");
+                    return;
             }
         }
 

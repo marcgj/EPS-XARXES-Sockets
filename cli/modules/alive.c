@@ -58,7 +58,7 @@ int send_wait_ALIVE(int sock, int t) {
     fd_set fileDesctiptors;
     struct timeval tv = {t, 0};
 
-    send_pdu_UDP(sock, alive_pkt, addr_srv, " ENVIAT ALIVE");
+    send_pdu_UDP(sock, alive_pkt, addr_srv, "ENVIAT ALIVE");
 
     FD_SET(sock, &fileDesctiptors);
     select(sock + 1, &fileDesctiptors, NULL, NULL, &tv);
@@ -82,6 +82,6 @@ int send_wait_ALIVE(int sock, int t) {
                 return -2;
         }
     }
-    print_error("NO s'ha rebut resposta a l'ALIVE en %is\n", t);
+    print_debug("NO s'ha rebut resposta a l'ALIVE en %is\n", t);
     return -1;
 }

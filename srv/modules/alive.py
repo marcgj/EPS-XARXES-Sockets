@@ -34,7 +34,7 @@ class AliveService:
                     else:
                         device.missedAlives += 1
 
-            time.sleep(0.5)
+            time.sleep(0.5)  # Per no malgastar recursos del ordenador
 
     def processAlive(self, device: Device):
         if device.status == Status.REGISTERED:
