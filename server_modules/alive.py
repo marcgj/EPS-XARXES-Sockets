@@ -20,6 +20,8 @@ class AliveService:
         self._cfg = cfg
         self._run()
 
+    # Cada 0,25s mira el temps que ha pasat per cada dispositiu en estat REG. o SEND_A., si pasa del maxim depenent del
+    # estat incrementa els alives perduts o be si esta en REGISTER el torna a DISC.
     def _handler(self):
         print_dbg("Fill creat per atendre els ALIVE")
         while True:
@@ -39,6 +41,8 @@ class AliveService:
                             device.lastAlive = now
             time.sleep(0.25)  # Per no malgastar recursos del ordenador
 
+    # Agafa el dispositiu pasat per parametre, si esta en REGISTERED completa del tot el registre i el canvia a SEND_A.
+    # tambe reseteja el temps desde el ultim alive i el comptador de alives perduts
     def processAlive(self, device: Device):
         if device.status == Status.REGISTERED:
             device.change_status(Status.SEND_ALIVE)

@@ -9,7 +9,12 @@ from server_modules.terminal import print_dbg, print_err, handle_terminal
 from server_modules.sockets import send, recive, TCP_PDU, config_TCP
 from server_modules.config import Device
 
+'''
+Aquest modul conte el servei encarregat de gestionar tant les conexions entrants per el port TCP com les que surten
+'''
 
+
+# Funcio que guarda una set/get/send en un archiu
 def _log_element_change(pdu):
     try:
         f = open(f"{pdu.txId}.data", "a")
@@ -30,6 +35,7 @@ class SendReciveService:
         self.sock = sock
         self._run()
 
+    # Es bloqueja al select i quan hi ha algo a llegir ho procesa segons la procedencia
     def _handler(self):
         print_dbg("Fill creat sendrecive")
         self.sock.listen(1)
@@ -37,7 +43,7 @@ class SendReciveService:
             i = select([self.sock, sys.stdin], [], [], None)[0]
             if self.sock in i:
                 self.handle_incoming_connection()
-            elif sys.stdin in i:
+            if sys.stdin in i:
                 text = input()
                 handle_terminal(text, self)
 
@@ -45,6 +51,7 @@ class SendReciveService:
         t = threading.Thread(target=self._handler, args=())
         t.start()
 
+    # Metode encarregat de acceptar la conexio entrant i gestionarla
     def handle_incoming_connection(self):
         sock, (ip, port) = self.sock.accept()
 
@@ -102,6 +109,7 @@ class SendReciveService:
 
         sock.close()
 
+    # Metode encarrregat de gestionar un get o un set
     def handle_outgoing_conexion(self, pdu_type, device, element, value=""):
         sock = config_TCP(0)
         try:
@@ -151,8 +159,3 @@ class SendReciveService:
             print_err(f"No s'ha rebut cap paquet en {self.m}s")
 
         sock.close()
-
-# get GHXE2LWQ6C LUM-0-O
-# set GHXE2LWQ6C LUM-0-I test
-# set LUM-0-I test
-# send LUM-0-I

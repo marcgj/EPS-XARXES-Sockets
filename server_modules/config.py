@@ -29,6 +29,7 @@ class Device:
         self.status = newStatus
         print_msg(f"Status del dispositiu {self.id} es {self.status.name}")
 
+    # Comprova que tots els camps d'un paquet es corresponguin amb les dades guardades del dispositiu
     def validate_pkt(self, pkt, ip):
         return ip == self.ip and pkt.commId == self.commId and pkt.txId == self.id
 
@@ -47,7 +48,6 @@ class ServerCfg:
 
     """
 
-    # Possible millora: fer anar configparse
     def __init__(self, cfgfilename: str, allowedsfilename: str):
         try:
             cfg = open(cfgfilename, 'r')
@@ -79,7 +79,6 @@ class ServerCfg:
             print(e)
             exit(1)
 
-    # TODO Canviar aquesta porqueria
     def __str__(self):
         print_msg("---------- Server Config ----------")
         print_msg(f"Id: {self.id}")

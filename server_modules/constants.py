@@ -1,5 +1,11 @@
 from enum import Enum
 
+'''
+Aquest archiu conte totes les diferents constants que es faran anar per els estats i els tipus de paquets. Aquests estan
+separats en dos classes diferents i que son subclases de Enum (similar als enum de java) per a tal de tenir el valor i
+el nom tot en un
+'''
+
 
 class Types(Enum):
     REG_REQ = 0xa0

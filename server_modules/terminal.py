@@ -3,15 +3,18 @@ import os
 from threading import Lock
 from server_modules.constants import Status, Types
 
+'''
+Aquest modul conte tots els metodes relacionats amb el terminal, te metodes per a imprimir errors, debug, o missatges
+per pantalla a part de el metode que gestiona les diferents comandes que es poden rebre per a terminal
+'''
+
 _debug = False
+lock = Lock()
 
 
 def _debug_on():
     global _debug
     _debug = True
-
-
-lock = Lock()
 
 
 # Per aquesta funcio he de fer anar un lock ja que al tindre prints en diferents procesos a vegades

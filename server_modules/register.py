@@ -7,6 +7,12 @@ from server_modules.constants import *
 from server_modules.sockets import *
 from server_modules.terminal import print_dbg
 
+'''
+Aquest modul conte la classe referent al proces de registre, que donat un dispositiu, genera un port i un commId 
+aleatori, i porta a terme la segona part del registre.
+Aquest es fa en un proces a part per a tal de poder registrar multiples clients simultaniament
+'''
+
 
 class RegisterProcedure:
     z = 2
@@ -19,6 +25,7 @@ class RegisterProcedure:
         self.device.commId = ""
         for _ in range(10):
             self.device.commId += str(randint(0, 9))
+        self.run()
 
     def _handler(self):
         print_dbg(f"Fill creat per el registre de {self.device.id}")

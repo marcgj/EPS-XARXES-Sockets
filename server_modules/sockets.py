@@ -4,6 +4,18 @@ from struct import pack, unpack
 from server_modules.constants import enum_from_value, Types
 from server_modules.terminal import print_msg, print_err, print_dbg
 
+'''
+Aquest modul conte les classes de les PDU i els diferents metodes per a crear sockets i enviar i rebre informacio
+
+De les classes de les pdu cal comenetar que en les dues es poden crear o be a partir de un buffer o be a partir de
+cada element per separat, i segons la forma de creacio es fara un pack o un upack
+
+Respecte als metodes per crear sockets, tots dos tipus de sockets es creen amb SO_REUSEADDR per a tal de no haver de
+esperar a que es tanqui el socket per a tornar a obrirlo
+
+Tambe com he comentat aquesta clase conte metodes per enviar i rebre informacio, n'hi ha dos per cada tipus de conexio
+i en tots casos son un send o recive normals pero que s'els pasa o retornen una pdu encomptes del buffer
+'''
 
 class UDP_PDU:
     _format = "B11s11s61s"

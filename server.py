@@ -20,8 +20,8 @@ def main():
     sockTCP = config_TCP(cfg.tcp)
     sockUDP = config_UDP(cfg.udp)
 
-    udpService = UDPService(cfg, sockUDP)
-    sendRecieveService = SendReciveService(cfg, sockTCP)
+    UDPService(cfg, sockUDP)
+    SendReciveService(cfg, sockTCP)
 
 
 def handle_args():

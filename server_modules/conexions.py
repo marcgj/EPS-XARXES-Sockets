@@ -27,10 +27,13 @@ class UDPService:
 
         while True:
             rcv_pkt, (ip, port) = recive_from(self._sock)
+            # Sempre es mira que el paquet rebut estiqui dins de la llista de autoritzats
             if not self._cfg.is_authorized_device(rcv_pkt.txId):
                 print_err(f"Dispositiu {rcv_pkt.txId} no esta autoritzat")
                 continue
 
+            # En el cas de rebe una peticio de registre fem les comprovacions pertinents i iniciem un nou
+            # proces de registre en un nou socket
             if rcv_pkt.type == Types.REG_REQ:
                 if rcv_pkt.commId != ZEROS or rcv_pkt.data:
                     print_err(f"Rebut REG_REQ erroni de {rcv_pkt.txId}")
@@ -46,8 +49,10 @@ class UDPService:
                 device.portUDP = port
 
                 procedure = RegisterProcedure(device, self._cfg)
-                procedure.run()
 
+            # En el cas de que el paquet sigui de tipus alive, comprovem que el dispositiu relacionat estiqui en algun
+            # dels dos estats que permeten alives i si els altres camps son correctes, per acabar s'envia a procesar
+            # all servei de alives
             elif rcv_pkt.type == Types.ALIVE:
                 device = self._cfg.devices.get(rcv_pkt.txId)
                 if not (device.status == Status.SEND_ALIVE or device.status == Status.REGISTERED):
@@ -64,9 +69,10 @@ class UDPService:
 
                 alive.processAlive(device)
 
+            # En cas de rebre un paquet diferent, el dispositiu pasara a DISC.
             else:
                 print_dbg("Paquet rebut erroni")
-                device = self._cfg.devices[rcv_pkt.txId]
+                device = self._cfg.devices.get(rcv_pkt.txId)
                 if device:
                     device.change_status(Status.DISCONNECTED)
 
