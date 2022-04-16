@@ -42,7 +42,7 @@ void send_element(Element elem) {
         print_debug("Inici proces enviament de dades\n");
         const int m = 3;
         const struct sockaddr_in addr_srv = sockaddr_in_generator(cfg.address, srv_info.tcp_port);
-        int sock = configure_tcp(cfg.local_TCP + 1);
+        int sock = configure_tcp(0);
 
         if (connect(sock, (struct sockaddr *) &addr_srv, sizeof(addr_srv)) < 0) {
             print_error("Ha fallat el connect del enviament de dades");

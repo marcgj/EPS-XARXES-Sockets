@@ -48,7 +48,7 @@ class UDPService:
                 device.ip = ip
                 device.portUDP = port
 
-                procedure = RegisterProcedure(device, self._cfg)
+                RegisterProcedure(device, self._cfg)
 
             # En el cas de que el paquet sigui de tipus alive, comprovem que el dispositiu relacionat estiqui en algun
             # dels dos estats que permeten alives i si els altres camps son correctes, per acabar s'envia a procesar
