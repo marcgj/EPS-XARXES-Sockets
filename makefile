@@ -1,6 +1,10 @@
 compile:
 	gcc -o client -ansi -pedantic -Wall -std=c17 client.c client_modules/config.c client_modules/headers/config.h client_modules/conexions.c client_modules/headers/conexions.h client_modules/terminal.c client_modules/headers/terminal.h client_modules/alive.c client_modules/headers/alive.h client_modules/pdu.c client_modules/headers/pdu.h client_modules/register.c client_modules/headers/register.h client_modules/sendrecive.c client_modules/headers/sendrecive.h client_modules/socket.c client_modules/headers/socket.h client_modules/headers/globals.h client_modules/globals.c
 
+
+compile2:
+	gcc -o client -ansi -pedantic -Wall -std=c17 client.c client_modules/config.c client_modules/conexions.c  client_modules/terminal.c client_modules/alive.c client_modules/pdu.c client_modules/register.c client_modules/sendrecive.c client_modules/socket.c client_modules/globals.c
+
 test_all_clients: compile
 	echo "TEST amb tots els clients"
 	./client &
@@ -9,3 +13,4 @@ test_all_clients: compile
 	./client -c client3.cfg &
 	./client -c client4.cfg &
 	./server.py
+
